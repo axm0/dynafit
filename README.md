@@ -17,7 +17,7 @@ To clone Dynafit, follow these steps:
    ```bash
    git clone https://github.com/your-username/dynafit.git](https://github.com/abdul-aziz-mohammed/dynafit.git
    ```
-##Cloning into a Branch
+## Cloning into a Branch
 If you want to clone a specific branch, follow these steps:
 
 Clone the repository:
@@ -41,7 +41,7 @@ Checkout to the specific branch:
    git checkout branch_name
    ```
 
-##Running Dynafit
+## Running Dynafit
 To run Dynafit, navigate to the project directory using cd on your CLI:
 
 Install the required dependencies:
@@ -61,5 +61,5 @@ Now your development environment should be working properly.
 
 To end the development environment, press Ctrl + C and type Y if prompted.
 
-##Guidelines
+## Guidelines
 Make sure to use a branch when making any changes.
