@@ -3,15 +3,15 @@ import { BottomNavigation, BottomNavigationAction } from '@mui/material';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
 import PersonIcon from '@mui/icons-material/Person';
-import { useNavigate } from 'react-router-dom'; // <-- Change here
+import { useNavigate } from 'react-router-dom';
 
 function BottomNav() {
-    const navigate = useNavigate(); // <-- Change here
+    const navigate = useNavigate();
     const [value, setValue] = React.useState('workout');
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
-        navigate('/' + newValue); // <-- Change here
+        navigate('/' + newValue);
     };
 
     return (

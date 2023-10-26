@@ -20,11 +20,12 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 // Middleware to parse JSON requests
 app.use(bodyParser.json());
 
-// Middleware to handle CORS (Cross-Origin Resource Sharing) - this allows your frontend to communicate with your backend
+// Middleware to handle CORS preflight requests for all endpoints
 app.use(cors({
-    origin: ['http://dynafitbackend.us-east-1.elasticbeanstalk.com', 'http://localhost:3000'],
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 const PORT = process.env.PORT || 5000;
@@ -129,7 +130,7 @@ app.get('/profile/:email', (req, res) => {
 
 // Update profile endpoint
 app.put('/profile/update', (req, res) => {
-    const { email, name } = req.body; // Only allowing name to be updated in this example
+    const { email, name } = req.body;
 
     const params = {
         TableName: "DynaFitUsers",
