@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import GenerateWorkout from './components/GenerateWorkout';
 import GenerateDiet from './components/GenerateDiet';
@@ -47,12 +47,14 @@ function AppContent() {
                         <>
                             <Route path="/" element={<Login />} />
                             <Route path="/register" element={<Register />} />
+                            <Route path="*" element={<Login />} /> {/* Redirect any other route to login */}
                         </>
                     ) : (
                         <>
                             <Route path="/workout" element={<GenerateWorkout />} />
                             <Route path="/diet" element={<GenerateDiet />} />
                             <Route path="/logout" element={<Logout />} />
+                            <Route path="/" element={<GenerateWorkout />} /> {/* Default to workout if root is accessed */}
                         </>
                     )}
                 </Routes>

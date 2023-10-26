@@ -16,10 +16,12 @@ function BottomNav() {
         setValue(newValue);
         if (newValue === "logout") {
             setCurrentUser(null);
+            navigate("/");  // navigate to root
         } else {
             navigate('/' + newValue);
         }
     };
+    
 
     return (
         <BottomNavigation value={value} onChange={handleChange} showLabels>
