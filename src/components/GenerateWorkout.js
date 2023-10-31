@@ -11,7 +11,7 @@ function GenerateWorkout() {
         e.preventDefault();
         const muscleGroupsArray = muscleGroups.split(',').map(item => item.trim());
         const equipmentArray = equipment.split(',').map(item => item.trim());
-        console.log({ duration, muscleGroups: muscleGroupsArray, equipment: equipmentArray });  // Log the data being sent
+        console.log({ duration, muscleGroups: muscleGroupsArray, equipment: equipmentArray });
         const response = await api.post('/generate-workout', { duration, muscleGroups: muscleGroupsArray, equipment: equipmentArray });
         setWorkout(response.data.workout);
     };    

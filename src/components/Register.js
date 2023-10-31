@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import api from '../services/api';
 import { useAuth } from '../AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 function Register() {
     const [email, setEmail] = useState('');
@@ -9,17 +10,23 @@ function Register() {
     const [message, setMessage] = useState('');
     const { setCurrentUser } = useAuth();
 
+    const navigate = useNavigate();
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const response = await api.post('/register', { email, password, name });
             setMessage(response.data.message);
             if (response.data.message === "User registered successfully") {
-                setCurrentUser(email);  // Set the user as logged in
+                setCurrentUser(email);
             }
         } catch (error) {
             setMessage("Failed to register. Try again.");
         }
+    };
+
+    const handleGoBackToLogin = () => {
+        navigate('/');
     };
 
     return (
@@ -45,10 +52,11 @@ function Register() {
                     onChange={(e) => setName(e.target.value)}
                 />
                 <button type="submit">Register</button>
-            </form>
-            {message && <p>{message}</p>}
-        </div>
-    );
-}
+                        </form>
+                        <button onClick={handleGoBackToLogin}>Go back to login</button>
+                        {message && <p>{message}</p>}
+                    </div>
+                );
+            }
 
 export default Register;
