@@ -175,9 +175,9 @@ app.post('/generate-workout', async (req, res) => {
         ];
 
         const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-            model: "gpt-3.5-turbo",
+            model: "gpt-4",
             messages: messages,
-            max_tokens: 2500
+            max_tokens: 5000
         }, {
             headers: {
                 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
@@ -220,9 +220,9 @@ app.post('/generate-diet', async (req, res) => {
         ];
         
         const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-            model: "gpt-3.5-turbo",
+            model: "gpt-4",
             messages: messages,
-            max_tokens: 2500
+            max_tokens: 5000
         }, {
             headers: {
                 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
