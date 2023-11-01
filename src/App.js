@@ -3,6 +3,7 @@ import './App.css';
 import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import GenerateWorkout from './components/GenerateWorkout';
+import ViewPastWorkouts from './components/ViewPastWorkouts';
 import GenerateDiet from './components/GenerateDiet';
 import Register from './components/Register';
 import Login from './components/Login';
@@ -52,6 +53,7 @@ function AppContent() {
                     ) : (
                         <>
                             <Route path="/workout" element={<GenerateWorkout />} />
+                            <Route path="/view-past-workouts" element={<ViewPastWorkouts />} />
                             <Route path="/diet" element={<GenerateDiet />} />
                             <Route path="/logout" element={<Logout />} />
                             <Route path="/" element={<GenerateWorkout />} /> {/* Default to workout if root is accessed */}

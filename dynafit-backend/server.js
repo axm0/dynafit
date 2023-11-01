@@ -5,6 +5,7 @@ const cors = require('cors');
 const AWS = require('aws-sdk');
 const bcrypt = require('bcrypt');
 const axios = require('axios');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 
@@ -199,6 +200,75 @@ app.post('/generate-workout', async (req, res) => {
     } catch (error) {
         console.error('Error fetching from OpenAI:', error);
         return res.status(500).json({ error: `Server error: ${error.message}` });
+    }
+});
+
+// Store workout endpoint
+app.post('/store-workout', async (req, res) => {
+    const { email, workout } = req.body;
+
+    // Validation: Check if email and workout are provided
+    if (!email || !workout) {
+        console.warn("Validation error: Both email and workout are required.");
+        return res.status(400).json({ error: "Both email and workout are required." });
+    }
+
+    const workoutId = uuidv4();
+    const timestamp = Date.now();  // Add a timestamp to each workout
+
+    // Use environment variable for table name or fallback to a default
+    const TABLE_NAME = process.env.DYNAMO_TABLE_NAME || "DynaFitWorkouts";
+
+    const params = {
+        TableName: TABLE_NAME,
+        Item: {
+            email: email,
+            workoutId: workoutId,
+            workout: workout,
+            timestamp: timestamp
+        }
+    };
+
+    try {
+        await dynamoDb.put(params).promise();
+        console.info(`Workout stored successfully for email: ${email}, workoutId: ${workoutId}`);
+        res.json({ message: "Workout stored successfully", workoutId: workoutId });
+    } catch (error) {
+        console.error(`Error storing workout for email: ${email}. Error: ${JSON.stringify(error)}`);
+        res.status(500).json({ error: `Could not store workout: ${error.message}` });
+    }
+});
+
+// Fetch workouts endpoint
+app.get('/fetch-workouts/:email', async (req, res) => {
+    const { email } = req.params;
+
+    // Validation: Check if email is provided
+    if (!email) {
+        console.warn("Validation error: Email is required to fetch workouts.");
+        return res.status(400).json({ error: "Email is required." });
+    }
+
+    const TABLE_NAME = process.env.DYNAMO_TABLE_NAME || "DynaFitWorkouts";
+
+    const params = {
+        TableName: TABLE_NAME,
+        KeyConditionExpression: "#email = :emailValue",
+        ExpressionAttributeNames: {
+            "#email": "email"
+        },
+        ExpressionAttributeValues: {
+            ":emailValue": email
+        }
+    };
+
+    try {
+        const result = await dynamoDb.query(params).promise();
+        console.info(`Fetched workouts for email: ${email}. Count: ${result.Items.length}`);
+        res.json(result.Items);
+    } catch (error) {
+        console.error(`Error fetching workouts for email: ${email}. Error: ${JSON.stringify(error)}`);
+        res.status(500).json({ error: `Could not fetch workouts: ${error.message}` });
     }
 });
 
