@@ -37,39 +37,74 @@ app.get('/', (req, res) => {
 });
 
 // Register endpoint
-app.post('/register', (req, res) => {
+app.post('/register', async (req, res) => {
     const { email, password, name } = req.body;
 
-    // Hash the password
-    bcrypt.hash(password, 10, (err, hashedPassword) => {
-        if (err) {
-            console.error(`Error hashing password: ${JSON.stringify(err)}`);
-            return res.status(500).json({ error: "Server error" });
-        }
+    // Validation: Check if email, password, and name are provided
+    if (!email || !password || !name) {
+        console.warn("Validation error: Email, password, and name are required.");
+        return res.status(400).json({ error: "Email, password, and name are required." });
+    }
 
-        const params = {
+    try {
+        // Check if a user with the provided email already exists
+        const paramsCheck = {
             TableName: "DynaFitUsers",
-            Item: {
-                email: email,
-                password: hashedPassword,
-                name: name
+            Key: {
+                email: email
             }
         };
 
-        dynamoDb.put(params, (error) => {
-            if (error) {
+        const checkResult = await dynamoDb.get(paramsCheck).promise();
+        if (checkResult.Item) {
+            console.warn(`User with email: ${email} already exists.`);
+            return res.status(409).json({ error: "User with this email already exists." });
+        }
+
+        // Hash the password
+        bcrypt.hash(password, 10, async (err, hashedPassword) => {
+            if (err) {
+                console.error(`Error hashing password: ${JSON.stringify(err)}`);
+                return res.status(500).json({ error: "Server error" });
+            }
+
+            const params = {
+                TableName: "DynaFitUsers",
+                Item: {
+                    email: email,       // Email as a string, as expected by your DynamoDB
+                    password: hashedPassword,
+                    name: name
+                }
+            };
+
+            try {
+                await dynamoDb.put(params).promise();
+                console.info(`User with email: ${email} registered successfully.`);
+                res.json({ message: "User registered successfully" });
+            } catch (error) {
                 console.error(`Error: ${JSON.stringify(error)}`);
                 res.status(500).json({ error: "Could not register user" });
-            } else {
-                res.json({ message: "User registered successfully" });
             }
         });
-    });
+    } catch (error) {
+        console.error(`Error checking user existence: ${JSON.stringify(error)}`);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 
-// Login endpoint
-app.post('/login', (req, res) => {
+
+const { promisify } = require('util'); // For converting bcrypt.compare to promise-based function.
+const { getDefaultAutoSelectFamilyAttemptTimeout } = require('net');
+const compare = promisify(bcrypt.compare); 
+
+app.post('/login', async (req, res) => {
     const { email, password } = req.body;
+
+    // Validation: Check if email and password are provided
+    if (!email || !password) {
+        console.warn("Validation error: Email and password are required.");
+        return res.status(400).json({ error: "Email and password are required." });
+    }
 
     const params = {
         TableName: "DynaFitUsers",
@@ -85,23 +120,26 @@ app.post('/login', (req, res) => {
         }
 
         if (result.Item) {
-            bcrypt.compare(password, result.Item.password, (err, isMatch) => {
-                if (err) {
+            compare(password, result.Item.password)
+                .then(isMatch => {
+                    if (isMatch) {
+                        return res.json({ message: "Logged in successfully" });
+                    } else {
+                        console.warn(`Login attempt with incorrect password for email: ${email}`);
+                        return res.status(401).json({ error: "Invalid email or password" }); // Using a generic message for security.
+                    }
+                })
+                .catch(err => {
                     console.error(`Error comparing passwords: ${JSON.stringify(err)}`);
                     return res.status(500).json({ error: "Server error" });
-                }
-
-                if (isMatch) {
-                    return res.json({ message: "Logged in successfully" });
-                } else {
-                    return res.status(401).json({ error: "Incorrect password" });
-                }
-            });
+                });
         } else {
-            return res.status(404).json({ error: "User not found" });
+            console.warn(`Login attempt for non-existent email: ${email}`);
+            return res.status(401).json({ error: "Invalid email or password" }); // Using a generic message for security.
         }
     });
 });
+
 
 // Profile endpoint
 app.get('/profile/:email', (req, res) => {
@@ -162,12 +200,16 @@ app.put('/profile/update', (req, res) => {
 app.post('/generate-workout', async (req, res) => {
     let { duration, muscleGroups, equipment } = req.body;
 
-    // Check and transform to arrays or use default values
-    duration = duration || '30'; // default value of 30 minutes if not provided
+    duration = duration || '30'; 
+
     muscleGroups = Array.isArray(muscleGroups) ? muscleGroups : (typeof muscleGroups === 'string' ? muscleGroups.split(',') : []);
     equipment = Array.isArray(equipment) ? equipment : (typeof equipment === 'string' ? equipment.split(',') : []);
 
-    const prompt = `Generate a ${duration} minute workout targeting the ${muscleGroups.join(', ')} using ${equipment.join(', ')}.`;
+    if (!muscleGroups.length || !equipment.length) {
+        return res.status(400).json({ error: "Muscle groups and equipment should not be empty." });
+    }
+
+    const prompt = `Generate a ${duration}-minute workout targeting the ${muscleGroups.join(', ')} using ${equipment.join(', ')}.`;
 
     try {
         const messages = [
@@ -204,38 +246,82 @@ app.post('/generate-workout', async (req, res) => {
 });
 
 // Store workout endpoint
+
+let workoutIdCounter = 1;
+
 app.post('/store-workout', async (req, res) => {
     const { email, workout } = req.body;
 
-    // Validation: Check if email and workout are provided
     if (!email || !workout) {
         console.warn("Validation error: Both email and workout are required.");
         return res.status(400).json({ error: "Both email and workout are required." });
     }
 
-    const workoutId = uuidv4();
-    const timestamp = Date.now();  // Add a timestamp to each workout
-
-    // Use environment variable for table name or fallback to a default
-    const TABLE_NAME = process.env.DYNAMO_TABLE_NAME || "DynaFitWorkouts";
-
-    const params = {
-        TableName: TABLE_NAME,
-        Item: {
-            email: email,
-            workoutId: workoutId,
-            workout: workout,
-            timestamp: timestamp
+    // Fetch existing workouts for this email
+    const queryParams = {
+        TableName: process.env.DYNAMO_TABLE_NAME || "DynaFitWorkouts",
+        KeyConditionExpression: "#email = :emailValue",
+        ExpressionAttributeNames: {
+            "#email": "email "
+        },
+        ExpressionAttributeValues: {
+            ":emailValue": email
         }
     };
 
     try {
+        const existingWorkouts = await dynamoDb.query(queryParams).promise();
+
+        if (existingWorkouts.Items.length >= 7) {
+            console.warn(`User ${email} already has 7 workouts. Cannot store more.`);
+            return res.status(400).json({ error: "Cannot store more than 7 workouts for a user." });
+        }
+
+        const workoutId = (existingWorkouts.Items.length + 1).toString();
+
+        const params = {
+            TableName: process.env.DYNAMO_TABLE_NAME || "DynaFitWorkouts",
+            Item: {
+                "email ": email,
+                "workoutId": workoutId,
+                "workout": workout
+            }
+        };
+
         await dynamoDb.put(params).promise();
         console.info(`Workout stored successfully for email: ${email}, workoutId: ${workoutId}`);
         res.json({ message: "Workout stored successfully", workoutId: workoutId });
+
     } catch (error) {
-        console.error(`Error storing workout for email: ${email}. Error: ${JSON.stringify(error)}`);
-        res.status(500).json({ error: `Could not store workout: ${error.message}` });
+        console.error(`Error storing or fetching workout for email: ${email}. Error: ${JSON.stringify(error)}`);
+        res.status(500).json({ error: `Could not process request: ${error.message}` });
+    }
+});
+
+// Delete workout endpoint
+app.delete('/delete-workout/:email/:workoutId', async (req, res) => {
+    const { email, workoutId } = req.params;
+
+    if (!email || !workoutId) {
+        console.warn("Validation error: Both email and workoutId are required.");
+        return res.status(400).json({ error: "Both email and workoutId are required." });
+    }
+
+    const params = {
+        TableName: process.env.DYNAMO_TABLE_NAME || "DynaFitWorkouts",
+        Key: {
+            "email ": email,
+            "workoutId": workoutId
+        }
+    };
+
+    try {
+        await dynamoDb.delete(params).promise();
+        console.info(`Workout deleted successfully for email: ${email}, workoutId: ${workoutId}`);
+        res.json({ message: "Workout deleted successfully" });
+    } catch (error) {
+        console.error(`Error deleting workout for email: ${email}. Error: ${JSON.stringify(error)}`);
+        res.status(500).json({ error: `Could not delete workout: ${error.message}` });
     }
 });
 
@@ -243,25 +329,21 @@ app.post('/store-workout', async (req, res) => {
 app.get('/fetch-workouts/:email', async (req, res) => {
     const { email } = req.params;
 
-    // Validation: Check if email is provided
     if (!email) {
         console.warn("Validation error: Email is required to fetch workouts.");
         return res.status(400).json({ error: "Email is required." });
     }
 
-    const TABLE_NAME = process.env.DYNAMO_TABLE_NAME || "DynaFitWorkouts";
-
     const params = {
-        TableName: TABLE_NAME,
+        TableName: process.env.DYNAMO_TABLE_NAME || "DynaFitWorkouts",
         KeyConditionExpression: "#email = :emailValue",
         ExpressionAttributeNames: {
-            "#email": "email"
+            "#email": "email "
         },
         ExpressionAttributeValues: {
             ":emailValue": email
         }
     };
-
     try {
         const result = await dynamoDb.query(params).promise();
         console.info(`Fetched workouts for email: ${email}. Count: ${result.Items.length}`);

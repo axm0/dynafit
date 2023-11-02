@@ -1,53 +1,64 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import { useAuth } from '../AuthContext';  // Import useAuth
-import { useNavigate } from 'react-router-dom';  // Import useNavigate
+import { useAuth } from '../AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 function GenerateWorkout() {
-    const { currentUser } = useAuth();  // Get currentUser from useAuth
+    const { currentUser } = useAuth();
     const [duration, setDuration] = useState('');
     const [muscleGroups, setMuscleGroups] = useState('');
     const [equipment, setEquipment] = useState('');
     const [workout, setWorkout] = useState('');
-    const navigate = useNavigate();  // Initialize useNavigate
+    const navigate = useNavigate();
 
-    console.log("currentUser:", currentUser);
-    
     const fetchWorkouts = async () => {
+        if (!currentUser || !currentUser.email) {
+            console.error('Current user or user email is missing.');
+            return;
+        }
+
         try {
             const response = await api.get(`/fetch-workouts/${currentUser.email}`);
-            console.log(response.data);  // Log the response data
+            console.log(response.data);
         } catch (error) {
             console.error('Failed to fetch workouts:', error);
         }
     };
 
+    const handleSaveWorkout = async () => {
+        try {
+            await api.post('/store-workout', { email: currentUser.email, workout: workout });
+            fetchWorkouts();
+            console.info('Workout saved successfully.');
+        } catch (error) {
+            console.error('Failed to save workout:', error);
+        }
+    };    
+
     useEffect(() => {
-        fetchWorkouts();  // Fetch workouts when component mounts
-    }, []);
+        fetchWorkouts();
+    }, [currentUser.email]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const muscleGroupsArray = muscleGroups.split(',').map(item => item.trim());
         const equipmentArray = equipment.split(',').map(item => item.trim());
-        const response = await api.post('/generate-workout', { duration, muscleGroups: muscleGroupsArray, equipment: equipmentArray });
-        setWorkout(response.data.workout);
-
-        // Store the generated workout
-        if (response && response.data && response.data.workout) {
-            try {
-                await api.post('/store-workout', { email: currentUser.email, workout: response.data.workout });
-                fetchWorkouts();  // Fetch workouts again after storing the new workout
-            } catch (error) {
-                console.error('Failed to store workout:', error);
+        
+        try {
+            const response = await api.post('/generate-workout', { duration, muscleGroups: muscleGroupsArray, equipment: equipmentArray });
+            
+            if (response && response.data && response.data.workout) {
+                setWorkout(response.data.workout);
+            } else {
+                console.error('Failed to generate workout:', response);
             }
-        } else {
-            console.error('Failed to generate workout:', response);
+        } catch (error) {
+            console.error('Failed to generate workout:', error);
         }
-    };    
-
+    };
+    
     const handleViewWorkouts = () => {
-        navigate('/view-past-workouts');  // Navigate to the View Past Workouts page
+        navigate('/view-past-workouts');
     }
 
     return (
@@ -73,13 +84,15 @@ function GenerateWorkout() {
                     onChange={(e) => setEquipment(e.target.value)}
                 />
                 <button type="submit">Generate</button>
-            </form>
-            {workout && (
+                </form>
+                {workout && (
                 <div>
                     <h3>Your Workout:</h3>
                     <p>{workout}</p>
+                    <button onClick={handleSaveWorkout}>Save This Workout</button>
                 </div>
             )}
+
             <button onClick={handleViewWorkouts}>
                 View Past Workouts
             </button>

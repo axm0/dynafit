@@ -18,8 +18,8 @@ function Register() {
             const response = await api.post('/register', { email, password, name });
             setMessage(response.data.message);
             if (response.data.message === "User registered successfully") {
-                setCurrentUser(email);
-            }
+                setCurrentUser({ email });
+            }            
         } catch (error) {
             setMessage("Failed to register. Try again.");
         }

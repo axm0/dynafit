@@ -15,7 +15,7 @@ function Login() {
             const response = await api.post('/login', { email, password });
             setMessage(response.data.message);
             if (response.data.message === "Logged in successfully") {
-                setCurrentUser(email);  // Set the user as logged in
+                setCurrentUser({ email });  // Set the user as logged in
             }
         } catch (error) {
             setMessage("Failed to login. Check your credentials.");
