@@ -39,8 +39,8 @@ function ViewPastWorkouts() {
     }, [currentUser.email]);
 
     const handleBack = () => {
-        navigate('/workout');
-    };
+        navigate('/workout-dashboard');
+    };    
 
     return (
         <div>

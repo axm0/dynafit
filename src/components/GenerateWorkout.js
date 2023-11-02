@@ -57,9 +57,9 @@ function GenerateWorkout() {
         }
     };
     
-    const handleViewWorkouts = () => {
-        navigate('/view-past-workouts');
-    }
+    const handleReturnToDashboard = () => {
+        navigate('/workout-dashboard'); // Assuming '/workout' is the path for the workout dashboard
+    };
 
     return (
         <div>
@@ -85,7 +85,7 @@ function GenerateWorkout() {
                 />
                 <button type="submit">Generate</button>
                 </form>
-                {workout && (
+            {workout && (
                 <div>
                     <h3>Your Workout:</h3>
                     <p>{workout}</p>
@@ -93,8 +93,8 @@ function GenerateWorkout() {
                 </div>
             )}
 
-            <button onClick={handleViewWorkouts}>
-                View Past Workouts
+            <button onClick={handleReturnToDashboard}>
+                Return to Workout Dashboard
             </button>
         </div>
     );

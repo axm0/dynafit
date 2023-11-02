@@ -2,9 +2,10 @@ import React from 'react';
 import './App.css';
 import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import WorkoutDashboard from './components/WorkoutDashboard'; // Corrected the import for WorkoutDashboard
 import GenerateWorkout from './components/GenerateWorkout';
 import ViewPastWorkouts from './components/ViewPastWorkouts';
-import GenerateDiet from './components/GenerateDiet';
+import GenerateDiet from './components/GenerateDiet'; // Keep only one import
 import Register from './components/Register';
 import Login from './components/Login';
 import Logout from './components/Logout';
@@ -52,11 +53,13 @@ function AppContent() {
                         </>
                     ) : (
                         <>
-                            <Route path="/workout" element={<GenerateWorkout />} />
+                            <Route path="/workout-dashboard" element={<WorkoutDashboard />} />
+                            <Route path="/generate-workout" element={<GenerateWorkout />} />
                             <Route path="/view-past-workouts" element={<ViewPastWorkouts />} />
                             <Route path="/diet" element={<GenerateDiet />} />
                             <Route path="/logout" element={<Logout />} />
-                            <Route path="/" element={<GenerateWorkout />} /> {/* Default to workout if root is accessed */}
+                            <Route path="/" element={<WorkoutDashboard />} /> {/* Default to WorkoutDashboard if root is accessed */}
+
                         </>
                     )}
                 </Routes>
