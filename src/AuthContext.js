@@ -13,9 +13,12 @@ export function AuthProvider({ children }) {
         // Load user from local storage when component is mounted
         const savedUser = localStorage.getItem('currentUser');
         if (savedUser) {
-            setCurrentUser(JSON.parse(savedUser));
-        }
-    }, []);  // Empty dependency array means this useEffect runs once when component mounts
+            const userObj = JSON.parse(savedUser);
+            if (userObj && userObj.email) {
+                setCurrentUser(userObj);
+            }
+        }        
+    }, []);
 
     const value = {
         currentUser,
