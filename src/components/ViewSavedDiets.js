@@ -34,7 +34,6 @@ function ViewSavedDiets() {
         fetchSavedDiets();
     }, [currentUser]);
     
-
     const handleDelete = async (dietID) => {
         if (!currentUser) {
             console.error('No current user found');

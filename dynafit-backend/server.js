@@ -485,28 +485,33 @@ app.get('/fetch-diets/:email', async (req, res) => {
 });
 
 //Delete Diet Plan Endpoint
-app.delete('/delete-diet/:email/:dietID', async (req, res) => {
-    const { email, dietID } = req.params;
+app.delete('/delete-diet/:email/:DietID', async (req, res) => {
+    let { email, DietID } = req.params;
 
-    if (!email || !dietID) {
-        console.warn("Validation error: Both email and dietID are required.");
-        return res.status(400).json({ error: "Both email and dietID are required." });
+    email = email.trim();
+    DietID = DietID.trim();
+
+    if (!email || !DietID) {
+        console.warn("Validation error: Both email and DietID are required.");
+        return res.status(400).json({ error: "Both email and DietID are required." });
     }
+
+    console.log(`Attempting to delete diet with email: '${email}' and DietID: '${DietID}'`);
 
     const params = {
         TableName: "DynaFitDiets",
         Key: {
             "email ": email,
-            "dietID": dietID
+            "DietID": DietID
         }
     };
 
     try {
         await dynamoDb.delete(params).promise();
-        console.info(`Diet plan deleted successfully for email: ${email}, dietID: ${dietID}`);
+        console.info(`Diet plan deleted successfully for email: ${email}, DietID: ${DietID}`);
         res.json({ message: "Diet plan deleted successfully" });
     } catch (error) {
-        console.error(`Error deleting diet plan for email: ${email}. Error: ${JSON.stringify(error)}`);
+        console.error(`Error deleting diet plan for email: ${email}, DietID: ${DietID}. Error: ${JSON.stringify(error)}`);
         res.status(500).json({ error: `Could not delete diet plan: ${error.message}` });
     }
 });
