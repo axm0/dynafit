@@ -356,14 +356,21 @@ app.get('/fetch-workouts/:email', async (req, res) => {
 
 // Generate diet endpoint
 app.post('/generate-diet', async (req, res) => {
-    let { dietaryPreferences, allergies, goals } = req.body;
+    let { preferences, allergies, goals } = req.body;
 
-    // Check and transform to arrays or use default values
-    dietaryPreferences = Array.isArray(dietaryPreferences) ? dietaryPreferences : (typeof dietaryPreferences === 'string' ? dietaryPreferences.split(',') : []);
-    allergies = Array.isArray(allergies) ? allergies : (typeof allergies === 'string' ? allergies.split(',') : []);
-    goals = Array.isArray(goals) ? goals : (typeof goals === 'string' ? goals.split(',') : []);
+    preferences = Array.isArray(preferences) ? preferences : (typeof preferences === 'string' ? preferences.split(',').map(p => p.trim()) : []);
+    allergies = Array.isArray(allergies) ? allergies : (typeof allergies === 'string' ? allergies.split(',').map(a => a.trim()) : []);
+    goals = Array.isArray(goals) ? goals : (typeof goals === 'string' ? goals.split(',').map(g => g.trim()) : []);
 
-    const prompt = `Create a diet plan keeping in mind the following preferences: ${dietaryPreferences.join(', ')}, allergies: ${allergies.join(', ')} and aiming to achieve these goals: ${goals.join(', ')}.`;
+    if (!preferences.length && !allergies.length && !goals.length) {
+        return res.status(400).json({ error: "At least one of preferences, allergies, or goals must be provided." });
+    }
+
+    const prompts = [];
+    if (preferences.length) prompts.push(`preferences: ${preferences.join(', ')}`);
+    if (allergies.length) prompts.push(`allergies: ${allergies.join(', ')}`);
+    if (goals.length) prompts.push(`goals: ${goals.join(', ')}`);
+    const prompt = `Create a diet plan keeping in mind the following ${prompts.join(', ')}.`;
 
     try {
         const messages = [
@@ -398,6 +405,111 @@ app.post('/generate-diet', async (req, res) => {
     }   
 });
 
+//Store Diet Plan Endpoint
+app.post('/store-diet', async (req, res) => {
+    const { email, dietPlan } = req.body;
+
+    if (!email || !dietPlan) {
+        console.warn("Validation error: Both email and dietPlan are required.");
+        return res.status(400).json({ error: "Both email and dietPlan are required." });
+    }
+
+    const queryParams = {
+        TableName: "DynaFitDiets",
+        KeyConditionExpression: "#email = :emailValue",
+        ExpressionAttributeNames: {
+            "#email": "email "
+        },
+        ExpressionAttributeValues: {
+            ":emailValue": email
+        }
+    };
+
+    try {
+        const existingDiets = await dynamoDb.query(queryParams).promise();
+
+        if (existingDiets.Items.length >= 7) {
+            console.warn(`User ${email} already has 7 diet plans. Cannot store more.`);
+            return res.status(400).json({ error: "Cannot store more than 7 diet plans for a user." });
+        }
+
+        const dietID = `diet_${existingDiets.Items.length + 1}`;
+
+        const params = {
+            TableName: "DynaFitDiets",
+            Item: {
+                "email ": email,
+                "DietID": dietID,
+                "dietPlan": dietPlan
+            }
+        };
+
+        await dynamoDb.put(params).promise();
+        console.info(`Diet plan stored successfully for email: ${email}, dietID: ${dietID}`);
+        res.json({ message: "Diet plan stored successfully", dietID: dietID });
+
+    } catch (error) {
+        console.error(`Error storing or fetching diet plan for email: ${email}. Error: ${JSON.stringify(error)}`);
+        res.status(500).json({ error: `Could not process request: ${error.message}` });
+    }
+});
+
+//Fetch Diet Plan Endpoint
+app.get('/fetch-diets/:email', async (req, res) => {
+    const { email } = req.params;
+
+    if (!email) {
+        console.warn("Validation error: Email is required to fetch diet plans.");
+        return res.status(400).json({ error: "Email is required." });
+    }
+
+    const params = {
+        TableName: "DynaFitDiets",
+        KeyConditionExpression: "#email = :emailValue",
+        ExpressionAttributeNames: {
+            "#email": "email "
+        },
+        ExpressionAttributeValues: {
+            ":emailValue": email
+        }
+    };
+
+    try {
+        const result = await dynamoDb.query(params).promise();
+        console.info(`Fetched diet plans for email: ${email}. Count: ${result.Items.length}`);
+        res.json(result.Items);
+    } catch (error) {
+        console.error(`Error fetching diet plans for email: ${email}. Error: ${JSON.stringify(error)}`);
+        res.status(500).json({ error: `Could not fetch diet plans: ${error.message}` });
+    }
+});
+
+//Delete Diet Plan Endpoint
+app.delete('/delete-diet/:email/:dietID', async (req, res) => {
+    const { email, dietID } = req.params;
+
+    if (!email || !dietID) {
+        console.warn("Validation error: Both email and dietID are required.");
+        return res.status(400).json({ error: "Both email and dietID are required." });
+    }
+
+    const params = {
+        TableName: "DynaFitDiets",
+        Key: {
+            "email ": email,
+            "dietID": dietID
+        }
+    };
+
+    try {
+        await dynamoDb.delete(params).promise();
+        console.info(`Diet plan deleted successfully for email: ${email}, dietID: ${dietID}`);
+        res.json({ message: "Diet plan deleted successfully" });
+    } catch (error) {
+        console.error(`Error deleting diet plan for email: ${email}. Error: ${JSON.stringify(error)}`);
+        res.status(500).json({ error: `Could not delete diet plan: ${error.message}` });
+    }
+});
 
 // Start the server
 app.listen(PORT, () => {

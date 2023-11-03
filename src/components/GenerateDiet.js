@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import api from '../services/api';
+import { useAuth } from '../AuthContext';
 
 function GenerateDiet() {
+    const { currentUser } = useAuth();
     const [preferences, setPreferences] = useState('');
     const [allergies, setAllergies] = useState('');
     const [goals, setGoals] = useState('');
@@ -12,6 +14,28 @@ function GenerateDiet() {
         const response = await api.post('/generate-diet', { preferences, allergies, goals });
         setDiet(response.data.diet);
     };
+
+    const handleSaveDiet = async () => {
+        if (!diet) {
+            alert('No diet to save!');
+            return;
+        }
+        const userEmail = currentUser.email;
+    
+        await api.post('/store-diet', {
+            email: userEmail,
+            dietPlan: diet
+        })
+        .then(() => {
+            alert('Diet saved successfully!');
+        })
+        .catch((error) => {
+            console.error('Error saving the diet:', error);
+            alert('Failed to save diet. Please try again.');
+        });
+    };
+    
+    
 
     return (
         <div>
@@ -54,7 +78,12 @@ function GenerateDiet() {
                     <button type="submit">Generate</button>
                 </div>
             </form>
-            {diet && <div><h3>Your Diet Plan:</h3><p>{diet}</p></div>}
+            {diet && (
+                <>
+                    <div><h3>Your Diet Plan:</h3><p>{diet}</p></div>
+                    <button onClick={handleSaveDiet}>Save Diet Plan</button>
+                </>
+            )}
         </div>
     );
 }

@@ -14,11 +14,17 @@ function BottomNav() {
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
-        if (newValue === "logout") {
-            setCurrentUser(null);
-            navigate("/");  // navigate to root
-        } else {
-            navigate('/' + newValue);
+        switch (newValue) {
+            case "logout":
+                setCurrentUser(null);
+                navigate("/");
+                break;
+            case "diet":
+                navigate("/diet-dashboard");
+                break;
+            default:
+                navigate('/' + newValue);
+                break;
         }
     };
     
@@ -26,7 +32,7 @@ function BottomNav() {
     return (
         <BottomNavigation value={value} onChange={handleChange} showLabels>
             <BottomNavigationAction label="Workout" value="workout-dashboard" icon={<FitnessCenterIcon />} />
-            <BottomNavigationAction label="Diet" value="diet" icon={<RestaurantMenuIcon />} />
+            <BottomNavigationAction label="Diet" value="diet-dashboard" icon={<RestaurantMenuIcon />} />
             <BottomNavigationAction label="Profile" value="profile" icon={<PersonIcon />} />
             <BottomNavigationAction label="Logout" value="logout" icon={<LogoutIcon />} /> 
         </BottomNavigation>
