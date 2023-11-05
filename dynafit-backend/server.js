@@ -528,8 +528,8 @@ app.post('/generate-water', async (req, res) => {
     }
 
     const prompts = [];
-    if (preferences.length) prompts.push(`amountOfWater: ${amountOfWater.join(', ')}`);
-    if (allergies.length) prompts.push(`unitOfWater: ${unitOfWater.join(', ')}`);
+    if (amountOfWaters.length) prompts.push(`amountOfWater: ${amountOfWater.join(', ')}`);
+    if (unitOfWater.length) prompts.push(`unitOfWater: ${unitOfWater.join(', ')}`);
     const prompt = `If I drank ${prompts.join(', ')} of water, based on the average human, How much more water will I have to drink to satisfy my daily intake?.`;
 
     try {
@@ -552,8 +552,8 @@ app.post('/generate-water', async (req, res) => {
         console.log("OpenAI response:", JSON.stringify(response.data.choices[0].message.content, null, 2));
 
         if (response && response.data && response.data.choices && response.data.choices[0] && response.data.choices[0].message && response.data.choices[0].message.content) {
-            const dietPlan = response.data.choices[0].message.content.trim();
-            return res.json({ diet: dietPlan });
+            const waterPlan = response.data.choices[0].message.content.trim();
+            return res.json({ water: waterPlan });
         } else {
             console.error(`Unexpected response format from OpenAI: ${JSON.stringify(response.data)}`);
             return res.status(500).json({ error: 'Unexpected response format from OpenAI' });
