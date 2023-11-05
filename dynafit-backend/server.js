@@ -516,6 +516,55 @@ app.delete('/delete-diet/:email/:DietID', async (req, res) => {
     }
 });
 
+//Generate Amount Of Water Needed To Reach Goals
+app.post('/generate-water', async (req, res) => {
+    let { amountOfWater, unitOfWater} = req.body;
+
+    amountOfWater = Array.isArray(amountOfWater) ? amountOfWater : (typeof amountOfWater === 'string' ? amountOfWater.split(',').map(p => p.trim()) : []);
+    unitOfWater = Array.isArray(unitOfWater) ? unitOfWater : (typeof unitOfWater === 'string' ? unitOfWater.split(',').map(a => a.trim()) : []);
+
+    if (!amountOfWater.length && !unitOfWater.length) {
+        return res.status(400).json({ error: "Both Items must be provided." });
+    }
+
+    const prompts = [];
+    if (preferences.length) prompts.push(`amountOfWater: ${amountOfWater.join(', ')}`);
+    if (allergies.length) prompts.push(`unitOfWater: ${unitOfWater.join(', ')}`);
+    const prompt = `If I drank ${prompts.join(', ')} of water, based on the average human, How much more water will I have to drink to satisfy my daily intake?.`;
+
+    try {
+        const messages = [
+            { role: 'system', content: 'You are a helpful goal giver.' },
+            { role: 'user', content: prompt },
+        ];
+        
+        const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+            model: "gpt-4",
+            messages: messages,
+            max_tokens: 5000
+        }, {
+            headers: {
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log("OpenAI response:", JSON.stringify(response.data.choices[0].message.content, null, 2));
+
+        if (response && response.data && response.data.choices && response.data.choices[0] && response.data.choices[0].message && response.data.choices[0].message.content) {
+            const dietPlan = response.data.choices[0].message.content.trim();
+            return res.json({ diet: dietPlan });
+        } else {
+            console.error(`Unexpected response format from OpenAI: ${JSON.stringify(response.data)}`);
+            return res.status(500).json({ error: 'Unexpected response format from OpenAI' });
+        }
+
+    } catch (error) {
+        console.error('Error fetching from OpenAI:', error);
+        return res.status(500).json({ error: `Server error: ${error.message}` });
+    }   
+});
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
