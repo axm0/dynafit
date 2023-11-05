@@ -9,6 +9,7 @@ import GenerateDiet from './components/GenerateDiet';
 import ViewSavedDiets from './components/ViewSavedDiets';
 import DietDashboard from './components/DietDashboard';
 import Register from './components/Register';
+import Profile from './components/Profile'; // Make sure Profile is imported
 import Login from './components/Login';
 import Logout from './components/Logout';
 import BottomNavigation from './components/BottomNavigation';
@@ -61,8 +62,11 @@ function AppContent() {
               <Route path="/diet" element={<GenerateDiet />} />
               <Route path="/view-saved-diets" element={<ViewSavedDiets />} />
               <Route path="/diet-dashboard" element={<DietDashboard />} />
+              <Route path="/profile" element={<Profile />} /> {/* Add the Profile route here */}
               <Route path="/logout" element={<Logout />} />
               <Route path="/" element={<WorkoutDashboard />} />
+              {/* If you want a default fallback route for logged-in users, you can use:
+              <Route path="*" element={<WorkoutDashboard />} /> */}
             </>
           )}
         </Routes>
