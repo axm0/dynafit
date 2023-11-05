@@ -30,7 +30,7 @@ function BottomNav() {
     
 
     return (
-        <BottomNavigation value={value} onChange={handleChange} showLabels>
+        <BottomNavigation style={{position: 'sticky', bottom: 0}} value={value} onChange={handleChange} showLabels>
             <BottomNavigationAction label="Workout" value="workout-dashboard" icon={<FitnessCenterIcon />} />
             <BottomNavigationAction label="Diet" value="diet-dashboard" icon={<RestaurantMenuIcon />} />
             <BottomNavigationAction label="Profile" value="profile" icon={<PersonIcon />} />

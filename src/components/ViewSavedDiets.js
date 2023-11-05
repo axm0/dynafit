@@ -1,11 +1,15 @@
 import React, { useState, useEffect, useContext } from 'react';
 import api from '../services/api';
 import { useAuth } from '../AuthContext';
+import ReactMarkdown from "react-markdown";
+import { useNavigate } from 'react-router-dom';
 
+//Grace -- Testcase 31 View Saved Diet
 function ViewSavedDiets() {
     const [savedDiets, setSavedDiets] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const { currentUser } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchSavedDiets = async () => {
@@ -16,6 +20,7 @@ function ViewSavedDiets() {
                 return;
             }
             try {
+                //tries to fetch diets from database
                 const userEmail = currentUser.email;
                 const response = await api.get(`/fetch-diets/${encodeURIComponent(userEmail)}`);
                 const dietsData = response.data.map(diet => {
@@ -34,6 +39,12 @@ function ViewSavedDiets() {
         fetchSavedDiets();
     }, [currentUser]);
     
+    //sends back to diet dashboard 
+    const handleBack = () => {
+        navigate('/diet-dashboard');
+    }; 
+
+    //handles delete 
     const handleDelete = async (dietID) => {
         if (!currentUser) {
             console.error('No current user found');
@@ -53,16 +64,18 @@ function ViewSavedDiets() {
         return <div>Loading...</div>;
     }
 
+    //saved diet front end, goes through and displays all diets fetched
     return (
         <div>
-            <h2>Saved Diets</h2>
+            <h1>Saved Diets</h1>
             {savedDiets.length > 0 ? (
                 <ul>
                     {savedDiets.map(diet => (
                         <li key={diet.dietID}>
                             <div>
+                                <h2>{diet.dietID}</h2>
                                 {/* Directly display dietPlan which is a string */}
-                                <p>{diet.dietPlan}</p>
+                                <ReactMarkdown>{diet.dietPlan}</ReactMarkdown>
                                 <button onClick={() => handleDelete(diet.dietID)}>Delete</button>
                             </div>
                         </li>
@@ -71,6 +84,9 @@ function ViewSavedDiets() {
             ) : (
                 <p>No saved diets found.</p>
             )}
+            <div>
+                <button onClick={handleBack}>Back to Generate Diet</button>
+            </div>
         </div>
     );
 }
