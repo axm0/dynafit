@@ -2,12 +2,14 @@ import React, { useState, useEffect, useContext } from 'react';
 import api from '../services/api';
 import { useAuth } from '../AuthContext';
 import ReactMarkdown from "react-markdown";
+import { useNavigate } from 'react-router-dom';
 
 //Grace Testcase 31 Save Diet
 function ViewSavedDiets() {
     const [savedDiets, setSavedDiets] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const { currentUser } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchSavedDiets = async () => {
@@ -36,6 +38,10 @@ function ViewSavedDiets() {
         fetchSavedDiets();
     }, [currentUser]);
     
+    const handleBack = () => {
+        navigate('/diet-dashboard');
+    }; 
+
     const handleDelete = async (dietID) => {
         if (!currentUser) {
             console.error('No current user found');
@@ -74,6 +80,9 @@ function ViewSavedDiets() {
             ) : (
                 <p>No saved diets found.</p>
             )}
+            <div>
+                <button onClick={handleBack}>Back to Generate Diet</button>
+            </div>
         </div>
     );
 }

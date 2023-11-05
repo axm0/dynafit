@@ -8,10 +8,10 @@ function DietDashboard() {
     return (
         <div>
             <h2>Diet Dashboard</h2>
-            <div style={{margin: '20px 0' }}>
+            <div style={{margin: '13em 0'}}>
                 <button onClick={() => navigate('/diet')}>Generate New Diet!</button>
             </div>
-            <div style={{margin: '20px 0' }}>
+            <div style={{margin: '14em 0'}}>
                 <button onClick={() => navigate('/view-saved-diets')}>View Saved Diets</button>
             </div>
         </div>
