@@ -517,16 +517,17 @@ app.delete('/delete-diet/:email/:DietID', async (req, res) => {
 });
 
 //Generate Amount Of Water Needed To Reach Goals
+//The goal is to send this information to the api to generate our results
 app.post('/generate-water', async (req, res) => {
     let { amountOfWater, unitOfWater} = req.body;
-
+//This sets the string that it takes in
     amountOfWater = Array.isArray(amountOfWater) ? amountOfWater : (typeof amountOfWater === 'string' ? amountOfWater.split(',') : []);
     unitOfWater = Array.isArray(unitOfWater) ? unitOfWater : (typeof unitOfWater === 'string' ? unitOfWater.split(',') : []);
-
+//Makes sure that it is not empty
     if (!amountOfWater.length || !unitOfWater.length) {
         return res.status(400).json({ error: "Amount of water and unit of water should not be empty." });
     }
-
+//This is the prompt fed to the api
     const prompt = `If I take in ${amountOfWater.join(', ')}, ${unitOfWater.join(', ')} how much more water do I need to reach my daily intake as an average human.`;
 
     try {
@@ -556,7 +557,7 @@ app.post('/generate-water', async (req, res) => {
             console.error(`Unexpected response format from OpenAI: ${JSON.stringify(response.data)}`);
             return res.status(500).json({ error: 'Unexpected response format from OpenAI' });
         }
-
+//Catch any errors that may occur
     } catch (error) {
         console.error('Error fetching from OpenAI:', error);
         return res.status(500).json({ error: `Server error: ${error.message}` });
