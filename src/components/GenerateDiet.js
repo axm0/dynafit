@@ -43,7 +43,7 @@ function GenerateDiet() {
         <div>
             <h2>Generate Diet</h2>
             <form onSubmit={handleSubmit}>
-                <div style={{ display: 'block', margin: '7em 0' }}>
+                <div style={{ display: 'block', margin: '4em 0' }}>
                     <label style={{ display: 'block' }}>
                         Enter your dietary preferences:
                     </label>
@@ -54,7 +54,7 @@ function GenerateDiet() {
                             onChange={(e) => setPreferences(e.target.value)}
                         />
                 </div>
-                <div style={{ display: 'block', margin: '7em 0' }}>
+                <div style={{ display: 'block', margin: '4em 0' }}>
                     <label style={{ display: 'block' }}>
                         Enter your allergies:
                     </label>
@@ -65,7 +65,7 @@ function GenerateDiet() {
                             onChange={(e) => setAllergies(e.target.value)}
                         />
                 </div>
-                <div style={{ display: 'block', margin: '7em 0' }}>
+                <div style={{ display: 'block', margin: '4em 0' }}>
                     <label style={{ display: 'block' }}>
                         Enter your diet goals:
                     </label>
@@ -76,7 +76,7 @@ function GenerateDiet() {
                             onChange={(e) => setGoals(e.target.value)}
                         />
                 </div>
-                <div style={{ display: 'block', margin: '7em 0' }}>
+                <div style={{ display: 'block', margin: '4em 0' }}>
                     <button type="submit">Generate</button>
                 </div>
             </form>
