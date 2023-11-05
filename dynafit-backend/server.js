@@ -520,24 +520,21 @@ app.delete('/delete-diet/:email/:DietID', async (req, res) => {
 app.post('/generate-water', async (req, res) => {
     let { amountOfWater, unitOfWater} = req.body;
 
-    amountOfWater = Array.isArray(amountOfWater) ? amountOfWater : (typeof amountOfWater === 'string' ? amountOfWater.split(',').map(p => p.trim()) : []);
-    unitOfWater = Array.isArray(unitOfWater) ? unitOfWater : (typeof unitOfWater === 'string' ? unitOfWater.split(',').map(a => a.trim()) : []);
+    amountOfWater = Array.isArray(amountOfWater) ? amountOfWater : (typeof amountOfWater === 'string' ? amountOfWater.split(',') : []);
+    unitOfWater = Array.isArray(unitOfWater) ? unitOfWater : (typeof unitOfWater === 'string' ? unitOfWater.split(',') : []);
 
-    if (!amountOfWater.length && !unitOfWater.length) {
-        return res.status(400).json({ error: "Both Items must be provided." });
+    if (!amountOfWater.length || !unitOfWater.length) {
+        return res.status(400).json({ error: "Amount of water and unit of water should not be empty." });
     }
 
-    const prompts = [];
-    if (amountOfWaters.length) prompts.push(`amountOfWater: ${amountOfWater.join(', ')}`);
-    if (unitOfWater.length) prompts.push(`unitOfWater: ${unitOfWater.join(', ')}`);
-    const prompt = `If I drank ${prompts.join(', ')} of water, based on the average human, How much more water will I have to drink to satisfy my daily intake?.`;
+    const prompt = `If I take in ${amountOfWater.join(', ')}, ${unitOfWater.join(', ')} how much more water do I need to reach my daily intake as an average human.`;
 
     try {
         const messages = [
-            { role: 'system', content: 'You are a helpful goal giver.' },
-            { role: 'user', content: prompt },
+            { role: 'system', content: 'You are a helpful water counter.' },
+            { role: 'user', content: prompt }
         ];
-        
+
         const response = await axios.post('https://api.openai.com/v1/chat/completions', {
             model: "gpt-4",
             messages: messages,
@@ -551,9 +548,10 @@ app.post('/generate-water', async (req, res) => {
 
         console.log("OpenAI response:", JSON.stringify(response.data.choices[0].message.content, null, 2));
 
+        // Check the response structure and provide the water tracking
         if (response && response.data && response.data.choices && response.data.choices[0] && response.data.choices[0].message && response.data.choices[0].message.content) {
-            const waterPlan = response.data.choices[0].message.content.trim();
-            return res.json({ water: waterPlan });
+            const waterTracker = response.data.choices[0].message.content.trim();
+            return res.json({ water: waterTracker });
         } else {
             console.error(`Unexpected response format from OpenAI: ${JSON.stringify(response.data)}`);
             return res.status(500).json({ error: 'Unexpected response format from OpenAI' });
@@ -562,7 +560,7 @@ app.post('/generate-water', async (req, res) => {
     } catch (error) {
         console.error('Error fetching from OpenAI:', error);
         return res.status(500).json({ error: `Server error: ${error.message}` });
-    }   
+    }
 });
 
 
