@@ -4,7 +4,7 @@ import { useAuth } from '../AuthContext';
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from 'react-router-dom';
 
-//Grace Testcase 31 Save Diet
+//Grace -- Testcase 31 View Saved Diet
 function ViewSavedDiets() {
     const [savedDiets, setSavedDiets] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -20,6 +20,7 @@ function ViewSavedDiets() {
                 return;
             }
             try {
+                //tries to fetch diets from database
                 const userEmail = currentUser.email;
                 const response = await api.get(`/fetch-diets/${encodeURIComponent(userEmail)}`);
                 const dietsData = response.data.map(diet => {
@@ -38,10 +39,12 @@ function ViewSavedDiets() {
         fetchSavedDiets();
     }, [currentUser]);
     
+    //sends back to diet dashboard 
     const handleBack = () => {
         navigate('/diet-dashboard');
     }; 
 
+    //handles delete 
     const handleDelete = async (dietID) => {
         if (!currentUser) {
             console.error('No current user found');
@@ -61,6 +64,7 @@ function ViewSavedDiets() {
         return <div>Loading...</div>;
     }
 
+    //saved diet front end, goes through and displays all diets fetched
     return (
         <div>
             <h1>Saved Diets</h1>

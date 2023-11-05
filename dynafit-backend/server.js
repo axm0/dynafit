@@ -354,7 +354,8 @@ app.get('/fetch-workouts/:email', async (req, res) => {
     }
 });
 
-// Generate diet endpoint Grace Testcase 20 Generate Diet
+// Generate diet endpoint -- Grace Testcase 20 Generate Diet
+//this code sends the prompt to the GPT API and requests for the diet to be generated
 app.post('/generate-diet', async (req, res) => {
     let { preferences, allergies, goals } = req.body;
 
@@ -370,10 +371,11 @@ app.post('/generate-diet', async (req, res) => {
     if (preferences.length) prompts.push(`preferences: ${preferences.join(', ')}`);
     if (allergies.length) prompts.push(`allergies: ${allergies.join(', ')}`);
     if (goals.length) prompts.push(`goals: ${goals.join(', ')}`);
+    //prompt to ask for customized diet
     const prompt = `Create a 3 day diet plan keeping in mind the following ${prompts.join(', ')}Format like the following, do not include bullets:  \n
                         **Day 1**  \n**Breakfast**: this is the breakfast generated  \n**Lunch**: this is the lunch generated  \n**Dinner**: this is the dinner generated`;
 
-
+    //giving context to API
     try {
         const messages = [
             { role: 'system', content: 'You are a helpful diet planner.' },
@@ -395,10 +397,10 @@ app.post('/generate-diet', async (req, res) => {
 
         if (response && response.data && response.data.choices && response.data.choices[0] && response.data.choices[0].message && response.data.choices[0].message.content) {
             const dietPlan = response.data.choices[0].message.content.trim();
-            return res.json({ diet: dietPlan });
+            return res.json({ diet: dietPlan }); //return diet plan 
         } else {
             console.error(`Unexpected response format from OpenAI: ${JSON.stringify(response.data)}`);
-            return res.status(500).json({ error: 'Unexpected response format from OpenAI' });
+            return res.status(500).json({ error: 'Unexpected response format from OpenAI' }); //return error if soemthing went wrong 
         }
 
     } catch (error) {
@@ -407,10 +409,11 @@ app.post('/generate-diet', async (req, res) => {
     }   
 });
 
-//Store Diet Plan Endpoint Grace Testcase 31 Save Diet
+//Store Diet Plan Endpoint -- Grace Testcase 31 Save Diet
 app.post('/store-diet', async (req, res) => {
     const { email, dietPlan } = req.body;
 
+    //catch errors
     if (!email || !dietPlan) {
         console.warn("Validation error: Both email and dietPlan are required.");
         return res.status(400).json({ error: "Both email and dietPlan are required." });
@@ -427,6 +430,7 @@ app.post('/store-diet', async (req, res) => {
         }
     };
 
+    //storing diet in database
     try {
         const existingDiets = await dynamoDb.query(queryParams).promise();
 
@@ -476,6 +480,7 @@ app.get('/fetch-diets/:email', async (req, res) => {
         }
     };
 
+    //fetching diet plans from database 
     try {
         const result = await dynamoDb.query(params).promise();
         console.info(`Fetched diet plans for email: ${email}. Count: ${result.Items.length}`);
@@ -508,6 +513,7 @@ app.delete('/delete-diet/:email/:DietID', async (req, res) => {
         }
     };
 
+    //deleting diet plan from database 
     try {
         await dynamoDb.delete(params).promise();
         console.info(`Diet plan deleted successfully for email: ${email}, DietID: ${DietID}`);
