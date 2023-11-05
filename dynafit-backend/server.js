@@ -29,7 +29,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 5000;
 
 // Root endpoint
 app.get('/', (req, res) => {

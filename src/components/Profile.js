@@ -13,7 +13,7 @@ function getRandomMotivationalQuote() {
 class Profile extends Component {
     constructor(props) {
         super(props);
-        // Attempt to load saved state from localStorage
+        // Initialize state with default values or saved state (if it exists)
         const savedState = JSON.parse(localStorage.getItem('profileState')) || {};
         this.state = {
             weight: '',
@@ -27,27 +27,31 @@ class Profile extends Component {
             hydrationLevel: 0,
             workouts: [],
             newWorkout: '',
-            ...savedState, // Use savedState to override any default values if it exists
+            ...savedState, // Merge saved state to keep the user's information persistent across sessions
         };
     }
-    
-    
+
     componentDidMount() {
+        // Event listener to save state to localStorage when the window is about to unload
         window.addEventListener('beforeunload', this.saveStateToLocalStorage);
     }
 
     componentWillUnmount() {
+        // Clean up event listener and save state when the component is unmounted
         window.removeEventListener('beforeunload', this.saveStateToLocalStorage);
         this.saveStateToLocalStorage();
     }
 
     saveStateToLocalStorage = () => {
+        // Persist state to localStorage
         localStorage.setItem('profileState', JSON.stringify(this.state));
     }
 
     handleInputChange = (event) => {
+        // Handle input changes for weight, height, and gender fields
         const { name, value } = event.target;
         this.setState({ [name]: value }, () => {
+            // Recalculate BMI after weight or height input change
             if (this.state.weight && this.state.height) {
                 this.calculateBMI();
             }
@@ -55,6 +59,7 @@ class Profile extends Component {
     }
 
     calculateBMI = () => {
+        // Calculate and update BMI (TC21 - Kshitij)
         const weight = parseFloat(this.state.weight);
         const height = parseFloat(this.state.height) / 100;
         if (weight > 0 && height > 0) {
@@ -66,6 +71,7 @@ class Profile extends Component {
     }
 
     setBMICategory = (bmi) => {
+        // Set BMI category based on calculated BMI (TC21 - Kshitij)
         let bmiCategory = 'Underweight';
         if (bmi >= 18.5 && bmi < 24.9) {
             bmiCategory = 'Normal weight';
@@ -78,10 +84,12 @@ class Profile extends Component {
     }
 
     handleNewGoalChange = (event) => {
+        // Handle input changes for new goal field
         this.setState({ newGoal: event.target.value });
     }
 
     addGoal = () => {
+        // Add a new goal to the list (TC25 - Adam)
         if (this.state.newGoal) {
             this.setState({
                 goals: [...this.state.goals, this.state.newGoal],
@@ -91,21 +99,24 @@ class Profile extends Component {
     }
 
     removeGoal = (index) => {
+        // Remove a goal from the list (TC25 - Adam)
         this.setState({
             goals: this.state.goals.filter((_, i) => i !== index)
         });
     }
 
-
     handleWaterIntake = () => {
+        // Increment hydration level (TC29 & TC30 - Adam)
         this.setState({ hydrationLevel: this.state.hydrationLevel + 1 });
     }
 
     handleNewWorkoutChange = (event) => {
+        // Handle input changes for new workout field
         this.setState({ newWorkout: event.target.value });
     }
 
     addWorkout = () => {
+        // Add a new workout to the list (TC22 - Adam)
         if (this.state.newWorkout) {
             this.setState({
                 workouts: [...this.state.workouts, this.state.newWorkout],
@@ -115,12 +126,14 @@ class Profile extends Component {
     }
 
     removeWorkout = (index) => {
+        // Remove a workout from the list (TC22 - Adam)
         this.setState({
             workouts: this.state.workouts.filter((_, i) => i !== index)
         });
     }
 
     handleSubmit = (event) => {
+        // Handle form submission and prevent default form submission behavior
         event.preventDefault();
         console.log('User Profile Data:', this.state);
     }
