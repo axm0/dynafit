@@ -8,10 +8,30 @@ function WaterTracker() {
     const [unitOfWater, setunitOfWater] = useState('');
     const [water, setWater] = useState('');
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async (z) => {
+        z.preventDefault();
         const response = await api.post('/generate-water', { amountOfWater, unitOfWater });
         setWater(response.data.water);
+    };
+    
+    const handleSaveDiet = async () => {
+        if (!water) {
+            alert('No water to save!');
+            return;
+        }
+        const userEmail = currentUser.email;
+    
+        await api.post('/store-water', {
+            email: userEmail,
+            waterPlan: water
+        })
+        .then(() => {
+            alert('water saved successfully!');
+        })
+        .catch((error) => {
+            console.error('Error saving the water:', error);
+            alert('Failed to save water. Please try again.');
+        });
     };
     
 
@@ -27,7 +47,7 @@ function WaterTracker() {
                             type="text"
                             placeholder="e.g. 1 , 2, 4"
                             value={amountOfWater}
-                            onChange={(e) => setamountOfWater(e.target.value)}
+                            onChange={(z) => setamountOfWater(z.target.value)}
                         />
                 </div>
                 <div style={{ display: 'block', margin: '10px 0' }}>
@@ -38,7 +58,7 @@ function WaterTracker() {
                             type="text"
                             placeholder="e.g. cups, gallons"
                             value={unitOfWater}
-                            onChange={(e) => setunitOfWater(e.target.value)}
+                            onChange={(z) => setunitOfWater(z.target.value)}
                         />
                 </div>
                 <div style={{ display: 'block', margin: '10px 0' }}>
@@ -47,7 +67,8 @@ function WaterTracker() {
             </form>
             {water && (
                 <>
-                    <div><h3>Your Water Goals:</h3><p>{water}</p></div>
+                    <div><h3>Your Water Goals:</h3>
+                    <p>{water}</p></div>
                     
                 </>
             )}
