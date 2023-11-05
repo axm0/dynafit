@@ -516,7 +516,7 @@ app.delete('/delete-diet/:email/:DietID', async (req, res) => {
     }
 });
 
-//Generate Amount Of Water Needed To Reach Goals
+//Generate Amount Of Water Needed To Reach Goals (Kay Lin) TC11 Generating Goals
 //The goal is to send this information to the api to generate our results
 app.post('/generate-water', async (req, res) => {
     let { amountOfWater, unitOfWater} = req.body;
