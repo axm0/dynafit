@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import api from '../services/api';
 import { useAuth } from '../AuthContext';
 
-//Here is where we find our water goals and tracking
+//Here is where we find our water goals and tracking TC 8 TC 9 Kay Lin
 function WaterTracker() {
     const { currentUser } = useAuth();
     const [amountOfWater, setamountOfWater] = useState('');
