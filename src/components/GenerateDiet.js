@@ -1,7 +1,9 @@
 import React, { useState, useContext } from 'react';
 import api from '../services/api';
 import { useAuth } from '../AuthContext';
+import ReactMarkdown from "react-markdown";
 
+//Grace Testcase 20 Generate Diet and Testcase 31 Save Diet and Testcase 7 Access Generate Diet Page
 function GenerateDiet() {
     const { currentUser } = useAuth();
     const [preferences, setPreferences] = useState('');
@@ -80,7 +82,7 @@ function GenerateDiet() {
             </form>
             {diet && (
                 <>
-                    <div><h3>Your Diet Plan:</h3><p>{diet}</p></div>
+                    <div><h3>Your Diet Plan:</h3><ReactMarkdown>{diet}</ReactMarkdown></div>
                     <button onClick={handleSaveDiet}>Save Diet Plan</button>
                 </>
             )}

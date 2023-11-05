@@ -354,7 +354,7 @@ app.get('/fetch-workouts/:email', async (req, res) => {
     }
 });
 
-// Generate diet endpoint
+// Generate diet endpoint Grace Testcase 20 Generate Diet
 app.post('/generate-diet', async (req, res) => {
     let { preferences, allergies, goals } = req.body;
 
@@ -370,7 +370,9 @@ app.post('/generate-diet', async (req, res) => {
     if (preferences.length) prompts.push(`preferences: ${preferences.join(', ')}`);
     if (allergies.length) prompts.push(`allergies: ${allergies.join(', ')}`);
     if (goals.length) prompts.push(`goals: ${goals.join(', ')}`);
-    const prompt = `Create a diet plan keeping in mind the following ${prompts.join(', ')}.`;
+    const prompt = `Create a 3 day diet plan keeping in mind the following ${prompts.join(', ')}Format like the following, do not include bullets:  \n
+                        **Day 1**  \n**Breakfast**: this is the breakfast generated  \n**Lunch**: this is the lunch generated  \n**Dinner**: this is the dinner generated`;
+
 
     try {
         const messages = [
@@ -405,7 +407,7 @@ app.post('/generate-diet', async (req, res) => {
     }   
 });
 
-//Store Diet Plan Endpoint
+//Store Diet Plan Endpoint Grace Testcase 31 Save Diet
 app.post('/store-diet', async (req, res) => {
     const { email, dietPlan } = req.body;
 
@@ -484,7 +486,7 @@ app.get('/fetch-diets/:email', async (req, res) => {
     }
 });
 
-//Delete Diet Plan Endpoint
+//Delete Diet Plan Endpoint Grace Testcase 32 Delete Diet
 app.delete('/delete-diet/:email/:DietID', async (req, res) => {
     let { email, DietID } = req.params;
 

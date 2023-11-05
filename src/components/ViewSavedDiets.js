@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import api from '../services/api';
 import { useAuth } from '../AuthContext';
+import ReactMarkdown from "react-markdown";
 
+//Grace Testcase 31 Save Diet
 function ViewSavedDiets() {
     const [savedDiets, setSavedDiets] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -55,14 +57,15 @@ function ViewSavedDiets() {
 
     return (
         <div>
-            <h2>Saved Diets</h2>
+            <h1>Saved Diets</h1>
             {savedDiets.length > 0 ? (
                 <ul>
                     {savedDiets.map(diet => (
                         <li key={diet.dietID}>
                             <div>
+                                <h2>{diet.dietID}</h2>
                                 {/* Directly display dietPlan which is a string */}
-                                <p>{diet.dietPlan}</p>
+                                <ReactMarkdown>{diet.dietPlan}</ReactMarkdown>
                                 <button onClick={() => handleDelete(diet.dietID)}>Delete</button>
                             </div>
                         </li>
