@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-//This is the basic dashboard for water tracking
+//This is the basic dashboard for water tracking TC 10 Kay Lin
 function WaterDashboard() {
     const navigate = useNavigate();
 //This is the layout with the button
