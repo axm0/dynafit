@@ -45,3 +45,4 @@ To start the backend server, run:
    ```bash
    node server.js
    ```
+After installing the required dependencies for both the frontend and backend, the application should work as intended on your local development environment.
