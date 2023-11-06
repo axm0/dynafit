@@ -47,7 +47,7 @@ To run Dynafit, navigate to the project directory using cd on your CLI:
 Install the required dependencies:
    ```bash
    npm install
-   npm install react-router-dom @mui/material @mui/icons-material axios @emotion/react @emotion/styled
+   npm install react-router-dom @mui/material @mui/icons-material axios @emotion/react @emotion/styled react-markdown
    ```
 To start the development server, run:
    ```bash
