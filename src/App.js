@@ -9,6 +9,8 @@ import GenerateDiet from './components/GenerateDiet';
 import ViewSavedDiets from './components/ViewSavedDiets';
 import DietDashboard from './components/DietDashboard';
 import Profile from './components/Profile'; 
+import WaterDashboard from "./components/WaterDashboard";
+import WaterTracker from "./components/WaterTracker";
 import Register from './components/Register';
 import Login from './components/Login';
 import Logout from './components/Logout';
@@ -63,6 +65,8 @@ function AppContent() {
               <Route path="/view-saved-diets" element={<ViewSavedDiets />} />
               <Route path="/diet-dashboard" element={<DietDashboard />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/water-tracker" element={<WaterTracker />} />
+              <Route path="/water-dashboard" element={<WaterDashboard />} />
               <Route path="/logout" element={<Logout />} />
               <Route path="/" element={<WorkoutDashboard />} />
             </>
