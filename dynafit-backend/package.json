@@ -10,7 +10,12 @@
   "engines": {
     "node": "14.x"
   },
-  "keywords": ["fitness", "backend", "DynaFit", "Node.js"],
+  "keywords": [
+    "fitness",
+    "backend",
+    "DynaFit",
+    "Node.js"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
