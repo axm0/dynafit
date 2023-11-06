@@ -12,7 +12,6 @@ import Profile from './components/Profile';
 import WaterDashboard from "./components/WaterDashboard";
 import WaterTracker from "./components/WaterTracker";
 import Register from './components/Register';
-import Profile from './components/Profile'; // Make sure Profile is imported
 import Login from './components/Login';
 import Logout from './components/Logout';
 import BottomNavigation from './components/BottomNavigation';
