@@ -524,6 +524,55 @@ app.delete('/delete-diet/:email/:DietID', async (req, res) => {
     }
 });
 
+//Generate Amount Of Water Needed To Reach Goals (Kay Lin) TC11 Generating Goals
+//The goal is to send this information to the api to generate our results
+app.post('/generate-water', async (req, res) => {
+    let { amountOfWater, unitOfWater} = req.body;
+//This sets the string that it takes in
+    amountOfWater = Array.isArray(amountOfWater) ? amountOfWater : (typeof amountOfWater === 'string' ? amountOfWater.split(',') : []);
+    unitOfWater = Array.isArray(unitOfWater) ? unitOfWater : (typeof unitOfWater === 'string' ? unitOfWater.split(',') : []);
+//Makes sure that it is not empty
+    if (!amountOfWater.length || !unitOfWater.length) {
+        return res.status(400).json({ error: "Amount of water and unit of water should not be empty." });
+    }
+//This is the prompt fed to the api
+    const prompt = `If I take in ${amountOfWater.join(', ')}, ${unitOfWater.join(', ')} how much more water do I need to reach my daily intake as an average human.`;
+
+    try {
+        const messages = [
+            { role: 'system', content: 'You are a helpful water counter.' },
+            { role: 'user', content: prompt }
+        ];
+
+        const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+            model: "gpt-4",
+            messages: messages,
+            max_tokens: 5000
+        }, {
+            headers: {
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log("OpenAI response:", JSON.stringify(response.data.choices[0].message.content, null, 2));
+
+        // Check the response structure and provide the water tracking
+        if (response && response.data && response.data.choices && response.data.choices[0] && response.data.choices[0].message && response.data.choices[0].message.content) {
+            const waterTracker = response.data.choices[0].message.content.trim();
+            return res.json({ water: waterTracker });
+        } else {
+            console.error(`Unexpected response format from OpenAI: ${JSON.stringify(response.data)}`);
+            return res.status(500).json({ error: 'Unexpected response format from OpenAI' });
+        }
+//Catch any errors that may occur
+    } catch (error) {
+        console.error('Error fetching from OpenAI:', error);
+        return res.status(500).json({ error: `Server error: ${error.message}` });
+    }
+});
+
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
