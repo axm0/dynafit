@@ -1,3 +1,4 @@
+// Abdul Aziz Mohammed
 import React, { useState } from 'react';
 import api from '../services/api';
 import { useAuth } from '../AuthContext';
@@ -15,17 +16,24 @@ function Register() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            // Send a POST request to '/register' with user registration data
             const response = await api.post('/register', { email, password, name });
+
+            // Set the message received from the server
             setMessage(response.data.message);
+
+            // If the server responds with "User registered successfully," set the current user
             if (response.data.message === "User registered successfully") {
                 setCurrentUser({ email });
             }            
         } catch (error) {
+            // Display a registration failure message
             setMessage("Failed to register. Try again.");
         }
     };
 
     const handleGoBackToLogin = () => {
+        // Navigate back to the login page ('/')
         navigate('/');
     };
 
@@ -52,11 +60,11 @@ function Register() {
                     onChange={(e) => setName(e.target.value)}
                 />
                 <button type="submit">Register</button>
-                        </form>
-                        <button onClick={handleGoBackToLogin}>Go back to login</button>
-                        {message && <p>{message}</p>}
-                    </div>
-                );
-            }
+            </form>
+            <button onClick={handleGoBackToLogin}>Go back to login</button>
+            {message && <p>{message}</p>}
+        </div>
+    );
+}
 
 export default Register;

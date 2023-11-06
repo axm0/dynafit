@@ -1,3 +1,4 @@
+// Adam Moffatt
 import React, { Component } from 'react';
 
 const motivationalQuotes = [

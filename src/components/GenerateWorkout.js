@@ -1,9 +1,11 @@
+// Abdul Aziz Mohammed
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 function GenerateWorkout() {
+    // Using hooks to manage component state and context
     const { currentUser } = useAuth();
     const [duration, setDuration] = useState('');
     const [muscleGroups, setMuscleGroups] = useState('');
@@ -11,6 +13,7 @@ function GenerateWorkout() {
     const [workout, setWorkout] = useState('');
     const navigate = useNavigate();
 
+    // Function to fetch the user's saved workouts
     const fetchWorkouts = async () => {
         if (!currentUser || !currentUser.email) {
             console.error('Current user or user email is missing.');
@@ -25,6 +28,7 @@ function GenerateWorkout() {
         }
     };
 
+    // Function to handle saving the generated workout
     const handleSaveWorkout = async () => {
         try {
             await api.post('/store-workout', { email: currentUser.email, workout: workout });
@@ -35,10 +39,12 @@ function GenerateWorkout() {
         }
     };    
 
+    // Use useEffect to fetch workouts when the component mounts or when currentUser.email changes
     useEffect(() => {
         fetchWorkouts();
     }, [currentUser.email]);
 
+    // Function to handle form submission and generate a workout
     const handleSubmit = async (e) => {
         e.preventDefault();
         const muscleGroupsArray = muscleGroups.split(',').map(item => item.trim());
@@ -57,10 +63,12 @@ function GenerateWorkout() {
         }
     };
     
+    // Function to handle navigation back to the workout dashboard
     const handleReturnToDashboard = () => {
         navigate('/workout-dashboard'); // Assuming '/workout' is the path for the workout dashboard
     };
 
+    // Render the component's UI
     return (
         <div>
             <h2>Generate Workout</h2>
@@ -84,7 +92,7 @@ function GenerateWorkout() {
                     onChange={(e) => setEquipment(e.target.value)}
                 />
                 <button type="submit">Generate</button>
-                </form>
+            </form>
             {workout && (
                 <div>
                     <h3>Your Workout:</h3>
@@ -92,7 +100,6 @@ function GenerateWorkout() {
                     <button onClick={handleSaveWorkout}>Save This Workout</button>
                 </div>
             )}
-
             <button onClick={handleReturnToDashboard}>
                 Return to Workout Dashboard
             </button>
