@@ -1,3 +1,4 @@
+// Minjae Chae
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../AuthContext';
@@ -11,8 +12,12 @@ function ViewPastWorkouts() {
 
     const handleDeleteWorkout = async (workoutId) => {
         try {
+            // Send a DELETE request to '/delete-workout' to delete a specific workout
             await api.delete(`/delete-workout/${currentUser.email}/${workoutId}`);
+            
+            // Fetch the updated list of past workouts
             fetchWorkouts();
+            
             console.info('Workout deleted successfully.');
         } catch (error) {
             console.error('Failed to delete workout:', error);
@@ -26,6 +31,7 @@ function ViewPastWorkouts() {
         }
 
         try {
+            // Send a GET request to '/fetch-workouts' to retrieve past workouts for the current user
             const response = await api.get(`/fetch-workouts/${currentUser.email}`);
             setPastWorkouts(response.data);
         } catch (err) {
@@ -35,10 +41,12 @@ function ViewPastWorkouts() {
     };
 
     useEffect(() => {
+        // Fetch past workouts when the component mounts or when the current user's email changes
         fetchWorkouts();
     }, [currentUser.email]);
 
     const handleBack = () => {
+        // Navigate back to the workout dashboard
         navigate('/workout-dashboard');
     };    
 
