@@ -1,27 +1,33 @@
+// Abdul Aziz Mohammed
 import React, { useState } from 'react';
 import api from '../services/api';
 import { useAuth } from '../AuthContext';
 import { Link } from 'react-router-dom';
 
 function Login() {
+    // Using hooks to manage component state
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const { setCurrentUser } = useAuth();
 
- const handleSubmit = async (e) => {
+    // Function to handle form submission for user login
+    const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const response = await api.post('/login', { email, password });
             setMessage(response.data.message);
+
+            // If login is successful, set the user as logged in
             if (response.data.message === "Logged in successfully") {
-                setCurrentUser({ email });  // Set the user as logged in
+                setCurrentUser({ email });
             }
         } catch (error) {
             setMessage("Failed to login. Check your credentials.");
         }
     };
 
+    // Render the component's UI
     return (
         <div>
             <h2>Login</h2>

@@ -9,7 +9,7 @@ const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 
-// AWS Configuration
+// AWS Configuration -  Abdul Aziz Mohammed
 AWS.config.update({
     region: process.env.AWS_REGION,
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -18,10 +18,10 @@ AWS.config.update({
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-// Middleware to parse JSON requests
+// Middleware to parse JSON requests -  Abdul Aziz Mohammed
 app.use(bodyParser.json());
 
-// Middleware to handle CORS preflight requests for all endpoints
+// Middleware to handle CORS preflight requests for all endpoints -  Abdul Aziz Mohammed
 app.use(cors({
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
@@ -31,12 +31,12 @@ app.use(cors({
 
 const PORT = process.env.PORT || 5000;
 
-// Root endpoint
+// Root endpoint -  Abdul Aziz Mohammed
 app.get('/', (req, res) => {
     res.send('DynaFit Backend is running');
 });
 
-// Register endpoint
+// Register endpoint -  Abdul Aziz Mohammed
 app.post('/register', async (req, res) => {
     const { email, password, name } = req.body;
 
@@ -92,11 +92,12 @@ app.post('/register', async (req, res) => {
     }
 });
 
-
-const { promisify } = require('util'); // For converting bcrypt.compare to promise-based function.
+// For converting bcrypt.compare to promise-based function. -  Abdul Aziz Mohammed
+const { promisify } = require('util'); 
 const { getDefaultAutoSelectFamilyAttemptTimeout } = require('net');
 const compare = promisify(bcrypt.compare); 
 
+// Login endpoint -  Abdul Aziz Mohammed
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -141,7 +142,7 @@ app.post('/login', async (req, res) => {
 });
 
 
-// Profile endpoint
+// Profile endpoint - Abdul Aziz Mohammed
 app.get('/profile/:email', (req, res) => {
     const { email } = req.params;
 
@@ -167,7 +168,7 @@ app.get('/profile/:email', (req, res) => {
     });
 });
 
-// Update profile endpoint
+// Update profile endpoint - Abdul Aziz Mohammed
 app.put('/profile/update', (req, res) => {
     const { email, name } = req.body;
 
@@ -196,27 +197,33 @@ app.put('/profile/update', (req, res) => {
     });
 });
 
-// Generate workout endpoint
+// Generate workout endpoint - Abdul Aziz Mohammed
 app.post('/generate-workout', async (req, res) => {
     let { duration, muscleGroups, equipment } = req.body;
 
+    // Ensure duration is provided, default to '30' if not
     duration = duration || '30'; 
 
+    // Ensure muscleGroups and equipment are arrays or convert string to arrays
     muscleGroups = Array.isArray(muscleGroups) ? muscleGroups : (typeof muscleGroups === 'string' ? muscleGroups.split(',') : []);
     equipment = Array.isArray(equipment) ? equipment : (typeof equipment === 'string' ? equipment.split(',') : []);
 
+    // Validate that muscleGroups and equipment are not empty
     if (!muscleGroups.length || !equipment.length) {
         return res.status(400).json({ error: "Muscle groups and equipment should not be empty." });
     }
 
+    // Create a prompt based on the provided inputs
     const prompt = `Generate a ${duration}-minute workout targeting the ${muscleGroups.join(', ')} using ${equipment.join(', ')}.`;
 
     try {
+        // Define a series of messages for interaction with an OpenAI model
         const messages = [
             { role: 'system', content: 'You are a helpful workout planner.' },
             { role: 'user', content: prompt }
         ];
 
+        // Send a request to an OpenAI API for generating a workout plan
         const response = await axios.post('https://api.openai.com/v1/chat/completions', {
             model: "gpt-4",
             messages: messages,
@@ -228,9 +235,10 @@ app.post('/generate-workout', async (req, res) => {
             }
         });
 
+        // Log the OpenAI response
         console.log("OpenAI response:", JSON.stringify(response.data.choices[0].message.content, null, 2));
 
-        // Check the response structure and provide the workout plan
+        // Check the response structure and provide the workout plan in the response
         if (response && response.data && response.data.choices && response.data.choices[0] && response.data.choices[0].message && response.data.choices[0].message.content) {
             const workoutPlan = response.data.choices[0].message.content.trim();
             return res.json({ workout: workoutPlan });
@@ -238,26 +246,28 @@ app.post('/generate-workout', async (req, res) => {
             console.error(`Unexpected response format from OpenAI: ${JSON.stringify(response.data)}`);
             return res.status(500).json({ error: 'Unexpected response format from OpenAI' });
         }
-
     } catch (error) {
+        // Handle errors, log them, and return a 500 error response
         console.error('Error fetching from OpenAI:', error);
         return res.status(500).json({ error: `Server error: ${error.message}` });
     }
 });
 
-// Store workout endpoint
+
+// Store workout endpoint - Abdul Aziz Mohammed
 
 let workoutIdCounter = 1;
 
 app.post('/store-workout', async (req, res) => {
     const { email, workout } = req.body;
 
+    // Check if both email and workout are provided in the request body
     if (!email || !workout) {
         console.warn("Validation error: Both email and workout are required.");
         return res.status(400).json({ error: "Both email and workout are required." });
     }
 
-    // Fetch existing workouts for this email
+    // Fetch existing workouts for the provided email
     const queryParams = {
         TableName: process.env.DYNAMO_TABLE_NAME || "DynaFitWorkouts",
         KeyConditionExpression: "#email = :emailValue",
@@ -270,15 +280,19 @@ app.post('/store-workout', async (req, res) => {
     };
 
     try {
+        // Query the DynamoDB table to retrieve existing workouts for the email
         const existingWorkouts = await dynamoDb.query(queryParams).promise();
 
+        // Check if the user already has 7 workouts (a maximum limit)
         if (existingWorkouts.Items.length >= 7) {
             console.warn(`User ${email} already has 7 workouts. Cannot store more.`);
             return res.status(400).json({ error: "Cannot store more than 7 workouts for a user." });
         }
 
+        // Generate a new workout ID (incremental)
         const workoutId = (existingWorkouts.Items.length + 1).toString();
 
+        // Define parameters to store the new workout in DynamoDB
         const params = {
             TableName: process.env.DYNAMO_TABLE_NAME || "DynaFitWorkouts",
             Item: {
@@ -288,52 +302,30 @@ app.post('/store-workout', async (req, res) => {
             }
         };
 
+        // Store the workout in DynamoDB
         await dynamoDb.put(params).promise();
+
+        // Log and respond with a success message and the workout ID
         console.info(`Workout stored successfully for email: ${email}, workoutId: ${workoutId}`);
         res.json({ message: "Workout stored successfully", workoutId: workoutId });
-
     } catch (error) {
+        // Handle errors, log them, and return a 500 error response
         console.error(`Error storing or fetching workout for email: ${email}. Error: ${JSON.stringify(error)}`);
         res.status(500).json({ error: `Could not process request: ${error.message}` });
     }
 });
 
-// Delete workout endpoint
-app.delete('/delete-workout/:email/:workoutId', async (req, res) => {
-    const { email, workoutId } = req.params;
-
-    if (!email || !workoutId) {
-        console.warn("Validation error: Both email and workoutId are required.");
-        return res.status(400).json({ error: "Both email and workoutId are required." });
-    }
-
-    const params = {
-        TableName: process.env.DYNAMO_TABLE_NAME || "DynaFitWorkouts",
-        Key: {
-            "email ": email,
-            "workoutId": workoutId
-        }
-    };
-
-    try {
-        await dynamoDb.delete(params).promise();
-        console.info(`Workout deleted successfully for email: ${email}, workoutId: ${workoutId}`);
-        res.json({ message: "Workout deleted successfully" });
-    } catch (error) {
-        console.error(`Error deleting workout for email: ${email}. Error: ${JSON.stringify(error)}`);
-        res.status(500).json({ error: `Could not delete workout: ${error.message}` });
-    }
-});
-
-// Fetch workouts endpoint
+// Fetch workouts endpoint - Minjae Chae
 app.get('/fetch-workouts/:email', async (req, res) => {
     const { email } = req.params;
 
+    // Check if the email parameter is provided in the request
     if (!email) {
         console.warn("Validation error: Email is required to fetch workouts.");
         return res.status(400).json({ error: "Email is required." });
     }
 
+    // Define DynamoDB query parameters to retrieve workouts associated with the provided email
     const params = {
         TableName: process.env.DYNAMO_TABLE_NAME || "DynaFitWorkouts",
         KeyConditionExpression: "#email = :emailValue",
@@ -344,13 +336,51 @@ app.get('/fetch-workouts/:email', async (req, res) => {
             ":emailValue": email
         }
     };
+
     try {
+        // Query the DynamoDB table to fetch workouts
         const result = await dynamoDb.query(params).promise();
+
+        // Log and respond with the fetched workouts
         console.info(`Fetched workouts for email: ${email}. Count: ${result.Items.length}`);
         res.json(result.Items);
     } catch (error) {
+        // Handle errors, log them, and return a 500 error response
         console.error(`Error fetching workouts for email: ${email}. Error: ${JSON.stringify(error)}`);
         res.status(500).json({ error: `Could not fetch workouts: ${error.message}` });
+    }
+});
+
+// Delete workout endpoint - Minjae Chae
+app.delete('/delete-workout/:email/:workoutId', async (req, res) => {
+    const { email, workoutId } = req.params;
+
+    // Check if both email and workoutId parameters are provided in the request
+    if (!email || !workoutId) {
+        console.warn("Validation error: Both email and workoutId are required.");
+        return res.status(400).json({ error: "Both email and workoutId are required." });
+    }
+
+    // Define parameters to specify the workout to be deleted
+    const params = {
+        TableName: process.env.DYNAMO_TABLE_NAME || "DynaFitWorkouts",
+        Key: {
+            "email ": email,
+            "workoutId": workoutId
+        }
+    };
+
+    try {
+        // Delete the specified workout from DynamoDB
+        await dynamoDb.delete(params).promise();
+
+        // Log and respond with a success message
+        console.info(`Workout deleted successfully for email: ${email}, workoutId: ${workoutId}`);
+        res.json({ message: "Workout deleted successfully" });
+    } catch (error) {
+        // Handle errors, log them, and return a 500 error response
+        console.error(`Error deleting workout for email: ${email}. Error: ${JSON.stringify(error)}`);
+        res.status(500).json({ error: `Could not delete workout: ${error.message}` });
     }
 });
 
