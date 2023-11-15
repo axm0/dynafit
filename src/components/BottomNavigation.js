@@ -1,5 +1,5 @@
 // Import necessary components and icons from Material-UI and React Router
-import React from 'react';
+import React, { useState } from 'react'; // Added useState import here
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
@@ -12,39 +12,44 @@ import { useAuth } from '../AuthContext';
 function BottomNav() {
     const navigate = useNavigate();
     const { setCurrentUser } = useAuth();
-    const [value, setValue] = React.useState('workout');
+    const [value, setValue] = useState('workout-dashboard');
 
     // Handle changes in the bottom navigation
     const handleChange = (event, newValue) => {
         setValue(newValue);
-        switch (newValue) {
-            case "logout":
-                // Clear the current user's session and navigate to the homepage
-                setCurrentUser(null);
-                navigate("/");
-                break;
-            case "diet":
-                // Navigate to the diet dashboard
-                navigate("/diet-dashboard");
-                break;
-            case "water":
-                navigate("/water-dashboard");
-                break;
-            default:
-                // Navigate to the selected page based on the newValue
-                navigate('/' + newValue);
-                break;
+        if (newValue === "logout") {
+            setCurrentUser(null);
+            navigate("/");
+        } else {
+            navigate(`/${newValue}`);
         }
     };
 
+    // Styles for the bottom navigation and actions
+    const bottomNavStyle = {
+        width: '100%',
+        position: 'fixed',
+        bottom: 0,
+        boxShadow: '0 -1px 10px -5px rgba(0, 0, 0, 0.2)',
+        borderRadius: '20px 20px 0 0',
+        background: '#0068FF',
+        color: 'white',
+        zIndex: 1000,
+    };
+
+    const bottomNavActionStyle = {
+        color: 'white',
+        padding: '10px',
+        minWidth: 'auto',
+    };
+
     return (
-        // Render the BottomNavigation component with BottomNavigationActions
-        <BottomNavigation style={{ position: 'sticky', bottom: 0 }} value={value} onChange={handleChange} showLabels>
-            <BottomNavigationAction label="Workout" value="workout-dashboard" icon={<FitnessCenterIcon />} />
-            <BottomNavigationAction label="Diet" value="diet-dashboard" icon={<RestaurantMenuIcon />} />
-            <BottomNavigationAction label="Profile" value="profile" icon={<PersonIcon />} />
-            <BottomNavigationAction label="Water Goals" value ="water-dashboard" icon = {<OpacityIcon />} />
-            <BottomNavigationAction label="Logout" value="logout" icon={<LogoutIcon />} /> 
+        <BottomNavigation style={bottomNavStyle} value={value} onChange={handleChange}>
+            <BottomNavigationAction label="Workout" value="workout-dashboard" icon={<FitnessCenterIcon />} style={bottomNavActionStyle} />
+            <BottomNavigationAction label="Diet" value="diet-dashboard" icon={<RestaurantMenuIcon />} style={bottomNavActionStyle} />
+            <BottomNavigationAction label="Profile" value="profile" icon={<PersonIcon />} style={bottomNavActionStyle} />
+            <BottomNavigationAction label="Water Goals" value="water-dashboard" icon={<OpacityIcon />} style={bottomNavActionStyle} />
+            <BottomNavigationAction label="Logout" value="logout" icon={<LogoutIcon />} style={bottomNavActionStyle} />
         </BottomNavigation>
     );
 }

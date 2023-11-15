@@ -13,6 +13,50 @@ function GenerateWorkout() {
     const [workout, setWorkout] = useState('');
     const navigate = useNavigate();
 
+    const formStyle = {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: '90%',
+        maxWidth: '320px',
+        margin: '0 auto',
+        padding: '20px',
+        boxSizing: 'border-box',
+    };
+
+    const inputStyle = {
+        width: '100%',
+        padding: '10px',
+        borderRadius: '20px',
+        border: '1px solid black',
+        marginBottom: '20px',
+    };
+
+    const buttonStyle = {
+        width: '90%',
+        padding: '10px',
+        borderRadius: '20px',
+        background: '#0068FF',
+        color: 'white',
+        fontWeight: '800',
+        fontSize: '24px',
+        border: 'none',
+        marginBottom: '20px',
+        cursor: 'pointer',
+        maxWidth: '320px',
+    };
+
+    const containerStyle = {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        height: 'auto',
+        paddingTop: '10vh',
+        paddingBottom: '10vh',
+        background: 'white',
+        marginBottom: '60px',
+    };
     // Function to fetch the user's saved workouts
     const fetchWorkouts = async () => {
         if (!currentUser || !currentUser.email) {
@@ -70,37 +114,40 @@ function GenerateWorkout() {
 
     // Render the component's UI
     return (
-        <div>
-            <h2>Generate Workout</h2>
-            <form onSubmit={handleSubmit}>
+        <div style={containerStyle}>
+            <h1 style={{ fontSize: 36, fontWeight: '800', marginTop: '20px', marginBottom: '20px' }}>Generate Workout</h1>
+            <form onSubmit={handleSubmit} style={formStyle}>
                 <input
+                    style={inputStyle}
                     type="text"
                     placeholder="Duration (e.g. 30 minutes)"
                     value={duration}
                     onChange={(e) => setDuration(e.target.value)}
                 />
                 <input
+                    style={inputStyle}
                     type="text"
                     placeholder="Muscle Groups (e.g. arms, legs)"
                     value={muscleGroups}
                     onChange={(e) => setMuscleGroups(e.target.value)}
                 />
                 <input
+                    style={inputStyle}
                     type="text"
                     placeholder="Equipment (e.g. dumbbells)"
                     value={equipment}
                     onChange={(e) => setEquipment(e.target.value)}
                 />
-                <button type="submit">Generate</button>
+                <button style={buttonStyle} type="submit">Generate</button>
             </form>
             {workout && (
-                <div>
+                <div style={{ width: '90%', maxWidth: '320px', textAlign: 'center' }}>
                     <h3>Your Workout:</h3>
                     <p>{workout}</p>
-                    <button onClick={handleSaveWorkout}>Save This Workout</button>
+                    <button onClick={handleSaveWorkout} style={buttonStyle}>Save This Workout</button>
                 </div>
             )}
-            <button onClick={handleReturnToDashboard}>
+            <button onClick={handleReturnToDashboard} style={buttonStyle}>
                 Return to Workout Dashboard
             </button>
         </div>

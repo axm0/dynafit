@@ -1,19 +1,51 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-//Grace -- Testcase 7 Access Generate Diet Page and View Saved Diets
 function DietDashboard() {
     const navigate = useNavigate();
 
-    //buttons to naviagate to generate and view diets 
+    const containerStyle = {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        height: 'auto',
+        paddingTop: '10vh',
+        paddingBottom: '10vh',
+        background: 'white',
+        marginBottom: '60px',
+    };
+
+    const buttonStyle = {
+        width: '90%',
+        padding: '10px',
+        borderRadius: '20px',
+        background: '#0068FF',
+        color: 'white',
+        fontWeight: '800',
+        fontSize: '24px',
+        border: 'none',
+        marginBottom: '20px',
+        cursor: 'pointer',
+        maxWidth: '320px',
+    };
+
+
+    const headingStyle = {
+        fontSize: '36px',
+        fontWeight: '800',
+        color: '#0d47a1',
+        marginBottom: '20px',
+    };
+
     return (
-        <div>
-            <h2>Diet Dashboard</h2>
-            <div style={{margin: '9em 0'}}>
-                <button onClick={() => navigate('/diet')}>Generate New Diet!</button>
+        <div style={containerStyle}>
+            <h1 style={headingStyle}>Diet Dashboard</h1>
+            <div style={{ width: '100%' }}>
+                <button onClick={() => navigate('/diet')} style={buttonStyle}>Generate New Diet!</button>
             </div>
-            <div style={{margin: '9em 0'}}>
-                <button onClick={() => navigate('/view-saved-diets')}>View Saved Diets</button>
+            <div style={{ width: '100%' }}>
+                <button onClick={() => navigate('/view-saved-diets')} style={buttonStyle}>View Saved Diets</button>
             </div>
         </div>
     );

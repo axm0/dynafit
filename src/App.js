@@ -16,6 +16,7 @@ import Login from './components/Login';
 import Logout from './components/Logout';
 import BottomNavigation from './components/BottomNavigation';
 import { AuthProvider, useAuth } from './AuthContext';
+import logoImage from './D.svg';
 
 const theme = createTheme({
   palette: {
@@ -45,8 +46,9 @@ function AppContent() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <h2>DynaFit</h2>
+      {/* Update the background color to white here */}
+      <header className="App-header" style={{ backgroundColor: 'white' }}>
+        <img src={logoImage} alt="Your App Logo" style={{ width: '100px', height: 'auto' }} />
       </header>
       <main>
         <Routes>

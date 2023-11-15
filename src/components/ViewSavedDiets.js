@@ -1,15 +1,50 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../AuthContext';
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from 'react-router-dom';
 
-//Grace -- Testcase 31 View Saved Diet
 function ViewSavedDiets() {
     const [savedDiets, setSavedDiets] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const { currentUser } = useAuth();
     const navigate = useNavigate();
+
+    // Shared styles
+    const containerStyle = {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        height: 'auto',
+        paddingTop: '10vh',
+        paddingBottom: '10vh', // Leave space for bottom navigation
+        background: 'white',
+        marginBottom: '60px', // Adjust this based on the height of your bottom navigation
+    };
+
+    const buttonStyle = {
+        width: '90%',
+        maxWidth: '320px',
+        padding: '10px',
+        borderRadius: '20px',
+        background: '#0068FF',
+        color: 'white',
+        fontWeight: '800',
+        fontSize: '18px',
+        border: 'none',
+        margin: '20px 0',
+        cursor: 'pointer',
+    };
+
+    const listItemStyle = {
+        background: '#f7f7f7',
+        borderRadius: '15px',
+        padding: '15px',
+        margin: '10px 0',
+        width: '90%',
+        maxWidth: '320px',
+    };
 
     useEffect(() => {
         const fetchSavedDiets = async () => {
@@ -64,19 +99,17 @@ function ViewSavedDiets() {
         return <div>Loading...</div>;
     }
 
-    //saved diet front end, goes through and displays all diets fetched
     return (
-        <div>
-            <h1>Saved Diets</h1>
+        <div style={containerStyle}>
+            <h1 style={{ fontSize: '36px', fontWeight: '800', marginBottom: '20px' }}>Saved Diets</h1>
             {savedDiets.length > 0 ? (
-                <ul>
+                <ul style={{ listStyle: 'none', padding: 0 }}>
                     {savedDiets.map(diet => (
-                        <li key={diet.dietID}>
+                        <li key={diet.dietID} style={listItemStyle}>
                             <div>
                                 <h2>{diet.dietID}</h2>
-                                {/* Directly display dietPlan which is a string */}
                                 <ReactMarkdown>{diet.dietPlan}</ReactMarkdown>
-                                <button onClick={() => handleDelete(diet.dietID)}>Delete</button>
+                                <button onClick={() => handleDelete(diet.dietID)} style={buttonStyle}>Delete</button>
                             </div>
                         </li>
                     ))}
@@ -84,9 +117,7 @@ function ViewSavedDiets() {
             ) : (
                 <p>No saved diets found.</p>
             )}
-            <div>
-                <button onClick={handleBack}>Back to Generate Diet</button>
-            </div>
+            <button onClick={handleBack} style={buttonStyle}>Back to Diet Dashboard</button>
         </div>
     );
 }
