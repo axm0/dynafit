@@ -9,6 +9,7 @@ function GenerateDiet() {
     const [allergies, setAllergies] = useState('');
     const [goals, setGoals] = useState('');
     const [diet, setDiet] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const containerStyle = {
         display: 'flex',
@@ -57,8 +58,15 @@ function GenerateDiet() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await api.post('/generate-diet', { preferences, allergies, goals });
-        setDiet(response.data.diet);
+        try {
+            setLoading(true); // Set loading to true when the API call starts
+            const response = await api.post('/generate-diet', { preferences, allergies, goals });
+            setDiet(response.data.diet);
+        } catch (error) {
+            console.error('Error generating diet:', error);
+        } finally {
+            setLoading(false); // Set loading to false when the API call completes (regardless of success or failure)
+        }
     };
 
     //code to handle when user clicks save diet 
@@ -122,7 +130,8 @@ function GenerateDiet() {
                 </label>
                 <button style={buttonStyle} type="submit">Generate</button>
             </form>
-            {diet && (
+            {loading && <p>Generating your diet...</p>}
+            {diet && !loading && (
                 <>
                     <div style={{ width: '90%', maxWidth: '320px', textAlign: 'center' }}>
                         <h3>Your Diet Plan:</h3>
