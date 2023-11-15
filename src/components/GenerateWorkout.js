@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../AuthContext';
 import { useNavigate } from 'react-router-dom';
+import ReactMarkdown from "react-markdown";
 
 function GenerateWorkout() {
     // Using hooks to manage component state and context
@@ -143,7 +144,7 @@ function GenerateWorkout() {
             {workout && (
                 <div style={{ width: '90%', maxWidth: '320px', textAlign: 'center' }}>
                     <h3>Your Workout:</h3>
-                    <p>{workout}</p>
+                    <ReactMarkdown>{workout}</ReactMarkdown>
                     <button onClick={handleSaveWorkout} style={buttonStyle}>Save This Workout</button>
                 </div>
             )}

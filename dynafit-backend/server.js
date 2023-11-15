@@ -214,7 +214,7 @@ app.post('/generate-workout', async (req, res) => {
     }
 
     // Create a prompt based on the provided inputs
-    const prompt = `Generate a ${duration}-minute workout targeting the ${muscleGroups.join(', ')} using ${equipment.join(', ')}.`;
+    const prompt = `Generate a ${duration}-minute workout targeting the ${muscleGroups.join(', ')} using ${equipment.join(', ')}. Format like the following: **Warm-Up (X minutes)**  \nput warm up generated here  \n\n**Main Workout**  \n*Exercise 1 (X minutes):* for x number of set with x number of reps\n and so on. No need to number the sections`;
 
     try {
         // Define a series of messages for interaction with an OpenAI model
