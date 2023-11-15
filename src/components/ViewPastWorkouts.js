@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../AuthContext';
 import { useNavigate } from 'react-router-dom';
+import ReactMarkdown from "react-markdown";
 
 function ViewPastWorkouts() {
     const { currentUser } = useAuth();
@@ -92,7 +93,7 @@ function ViewPastWorkouts() {
                 <div style={{ width: '100%' }}>
                     {pastWorkouts.map((workoutItem) => (
                         <div key={workoutItem.workoutId} style={workoutItemStyle}>
-                            <p><strong>Workout:</strong> {workoutItem.workout}</p>
+                            <ReactMarkdown>{workoutItem.workout}</ReactMarkdown>
                             <button onClick={() => handleDeleteWorkout(workoutItem.workoutId)} style={buttonStyle}>Delete</button>
                         </div>
                     ))}
