@@ -13,6 +13,7 @@ function GenerateWorkout() {
     const [equipment, setEquipment] = useState('');
     const [workout, setWorkout] = useState('');
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
 
     const formStyle = {
         display: 'flex',
@@ -79,6 +80,7 @@ function GenerateWorkout() {
             await api.post('/store-workout', { email: currentUser.email, workout: workout });
             fetchWorkouts();
             console.info('Workout saved successfully.');
+            alert('Workout saved successfully!');
         } catch (error) {
             console.error('Failed to save workout:', error);
         }
@@ -96,6 +98,7 @@ function GenerateWorkout() {
         const equipmentArray = equipment.split(',').map(item => item.trim());
         
         try {
+            setLoading(true); // Set loading to true when the API call starts
             const response = await api.post('/generate-workout', { duration, muscleGroups: muscleGroupsArray, equipment: equipmentArray });
             
             if (response && response.data && response.data.workout) {
@@ -105,6 +108,8 @@ function GenerateWorkout() {
             }
         } catch (error) {
             console.error('Failed to generate workout:', error);
+        } finally {
+            setLoading(false); // Set loading to false when the API call completes (regardless of success or failure)
         }
     };
     
@@ -141,7 +146,8 @@ function GenerateWorkout() {
                 />
                 <button style={buttonStyle} type="submit">Generate</button>
             </form>
-            {workout && (
+            {loading && <p>Generating your workout...</p>}
+            {workout && !loading && (
                 <div style={{ width: '90%', maxWidth: '320px', textAlign: 'center' }}>
                     <h3>Your Workout:</h3>
                     <ReactMarkdown>{workout}</ReactMarkdown>
