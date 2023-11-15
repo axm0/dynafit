@@ -521,33 +521,36 @@ app.get('/fetch-diets/:email', async (req, res) => {
     }
 });
 
-// Fetch Diet Plan Endpoint
-app.get('/fetch-diets/:email', async (req, res) => {
-    const { email } = req.params;
+//Delete Diet Plan Endpoint Grace Testcase 32 Delete Diet
+app.delete('/delete-diet/:email/:DietID', async (req, res) => {
+    let { email, DietID } = req.params;
 
-    if (!email) {
-        console.warn("Validation error: Email is required to fetch diet plans.");
-        return res.status(400).json({ error: "Email is required." });
+    email = email.trim();
+    DietID = DietID.trim();
+
+    if (!email || !DietID) {
+        console.warn("Validation error: Both email and DietID are required.");
+        return res.status(400).json({ error: "Both email and DietID are required." });
     }
+
+    console.log(`Attempting to delete diet with email: '${email}' and DietID: '${DietID}'`);
 
     const params = {
         TableName: "DynaFitDiets",
-        FilterExpression: "#email = :emailValue",
-        ExpressionAttributeNames: {
-            "#email": "email"
-        },
-        ExpressionAttributeValues: {
-            ":emailValue": email
+        Key: {
+            "email ": email,
+            "DietID": DietID
         }
     };
 
+    //deleting diet plan from database 
     try {
-        const result = await dynamoDb.scan(params).promise();
-        console.info(`Fetched diet plans for email: ${email}. Count: ${result.Items.length}`);
-        res.json(result.Items);
+        await dynamoDb.delete(params).promise();
+        console.info(`Diet plan deleted successfully for email: ${email}, DietID: ${DietID}`);
+        res.json({ message: "Diet plan deleted successfully" });
     } catch (error) {
-        console.error(`Error fetching diet plans for email: ${email}. Error: ${JSON.stringify(error)}`);
-        res.status(500).json({ error: `Could not fetch diet plans: ${error.message}` });
+        console.error(`Error deleting diet plan for email: ${email}, DietID: ${DietID}. Error: ${JSON.stringify(error)}`);
+        res.status(500).json({ error: `Could not delete diet plan: ${error.message}` });
     }
 });
 
