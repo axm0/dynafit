@@ -189,7 +189,9 @@ function GenerateDiet() {
                     </Box>
                 </Modal>
                 {/* Display selected preferences */}
-                <div>{preferences.join(', ')}</div>
+                <div style={{ marginTop: '0px',  marginBottom: '15px', padding: '10px', fontWeight: '700', fontSize: '18px', borderRadius: '13px', backgroundColor: 'lightgray' }}>
+                    {preferences.join(', ')}
+                </div>
 
                 {/* Button and Modal for Allergies */}
                 <Button variant="outlined" onClick={() => setAllergiesModalOpen(true)} style={buttonStyle}>
@@ -208,7 +210,9 @@ function GenerateDiet() {
                     </Box>
                 </Modal>
                 {/* Display selected allergies */}
-                <div>{allergies.join(', ')}</div>
+                <div style={{ marginTop: '0px',  marginBottom: '15px', borderRadius: '15px', padding: '10px', fontWeight: '700', fontSize: '18px', backgroundColor: 'lightgray' }}>
+                    {allergies.join(', ')}
+                </div>
 
                 {/* Button and Modal for Diet Goals */}
                 <Button variant="outlined" onClick={() => setGoalsModalOpen(true)} style={buttonStyle}>
@@ -227,7 +231,9 @@ function GenerateDiet() {
                     </Box>
                 </Modal>
                 {/* Display selected goal */}
-                <div>{goals.join(', ')}</div>
+                <div style={{ marginTop: '0px',  marginBottom: '15px', padding: '10px', borderRadius: '15px', fontWeight: '700', fontSize: '18px', backgroundColor: 'lightgray' }}>
+                    {goals.join(', ')}
+                </div>
 
                 {/* Validation Message */}
                 {validationMessage && (
