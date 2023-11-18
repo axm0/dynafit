@@ -1,3 +1,4 @@
+//Grace Yang
 import React, { useState } from 'react';
 import api from '../services/api';
 import { useAuth } from '../AuthContext';
@@ -59,7 +60,7 @@ function GenerateDiet() {
     const handleReturnToDashboard = () => {
         navigate('/diet-dashboard'); // Replace '/diet-dashboard' with your actual route
     };
-
+  
     const containerStyle = {
         display: 'flex',
         flexDirection: 'column',
@@ -252,4 +253,5 @@ function GenerateDiet() {
         </div>
     );
 }
+
 export default GenerateDiet;
