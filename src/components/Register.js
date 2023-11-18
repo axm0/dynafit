@@ -20,7 +20,7 @@ function Register() {
             if (response.data.message === "User registered successfully") {
                 setCurrentUser({ email });
                 navigate('/'); // Redirect to dashboard or home page after successful registration
-            }            
+            }
         } catch (error) {
             setMessage("Failed to register. Try again.");
         }

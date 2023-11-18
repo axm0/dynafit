@@ -1,5 +1,4 @@
-// Import necessary components and icons from Material-UI and React Router
-import React, { useState } from 'react'; // Added useState import here
+import React, { useState } from 'react';
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
@@ -14,7 +13,6 @@ function BottomNav() {
     const { setCurrentUser } = useAuth();
     const [value, setValue] = useState('workout-dashboard');
 
-    // Handle changes in the bottom navigation
     const handleChange = (event, newValue) => {
         setValue(newValue);
         if (newValue === "logout") {
@@ -25,7 +23,6 @@ function BottomNav() {
         }
     };
 
-    // Styles for the bottom navigation and actions
     const bottomNavStyle = {
         width: '100%',
         position: 'fixed',

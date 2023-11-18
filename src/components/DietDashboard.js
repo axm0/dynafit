@@ -31,7 +31,6 @@ function DietDashboard() {
         maxWidth: '320px',
     };
 
-
     const headingStyle = {
         fontSize: '36px',
         fontWeight: '800',
@@ -43,10 +42,14 @@ function DietDashboard() {
         <div style={containerStyle}>
             <h1 style={headingStyle}>Diet Dashboard</h1>
             <div style={{ width: '100%' }}>
-                <button onClick={() => navigate('/diet')} style={buttonStyle}>Generate New Diet!</button>
+                <button onClick={() => navigate('/diet')} style={buttonStyle}>
+                    Generate New Diet!
+                </button>
             </div>
             <div style={{ width: '100%' }}>
-                <button onClick={() => navigate('/view-saved-diets')} style={buttonStyle}>View Saved Diets</button>
+                <button onClick={() => navigate('/view-saved-diets')} style={buttonStyle}>
+                    View Saved Diets
+                </button>
             </div>
         </div>
     );
