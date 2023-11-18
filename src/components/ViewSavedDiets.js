@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../AuthContext';
@@ -47,56 +46,54 @@ function ViewSavedDiets() {
         maxWidth: '320px',
     };
 
-// Define fetchSavedDiets as a standalone function so it can be used in useEffect and handleDelete
-const fetchSavedDiets = async () => {
-    setIsLoading(true);
-    if (!currentUser) {
-        console.error('No current user found');
+    // Define fetchSavedDiets as a standalone function so it can be used in useEffect and handleDelete
+    const fetchSavedDiets = async () => {
+        setIsLoading(true);
+        if (!currentUser) {
+            console.error('No current user found');
+            setIsLoading(false);
+            return;
+        }
+        try {
+            const userEmail = currentUser.email;
+            const response = await api.get(`/fetch-diets/${encodeURIComponent(userEmail)}`);
+            const dietsData = response.data.map(diet => {
+                return {
+                    dietID: diet.DietID,
+                    dietPlan: diet.dietPlan
+                };
+            });
+            setSavedDiets(dietsData);
+        } catch (error) {
+            console.error('Failed to fetch diets:', error);
+        }
         setIsLoading(false);
-        return;
-    }
-    try {
-        const userEmail = currentUser.email;
-        const response = await api.get(`/fetch-diets/${encodeURIComponent(userEmail)}`);
-        const dietsData = response.data.map(diet => {
-            return {
-                dietID: diet.DietID,
-                dietPlan: diet.dietPlan
-            };
-        });
-        setSavedDiets(dietsData);
-    } catch (error) {
-        console.error('Failed to fetch diets:', error);
-    }
-    setIsLoading(false);
-};
+    };
 
-useEffect(() => {
-    fetchSavedDiets();
-}, [currentUser]); // This will call fetchSavedDiets when currentUser changes
+    useEffect(() => {
+        fetchSavedDiets();
+    }, [currentUser]); // This will call fetchSavedDiets when currentUser changes
 
-    
-    //sends back to diet dashboard 
+    // Sends back to diet dashboard 
     const handleBack = () => {
         navigate('/diet-dashboard');
-    }; 
+    };
 
-// Now handleDelete can call fetchSavedDiets since it's defined in the component scope
-const handleDelete = async (dietID) => {
-    if (!currentUser) {
-        console.error('No current user found');
-        return;
-    }
-    setIsLoading(true);
-    try {
-        await api.delete(`/delete-diet/${currentUser.email}/${dietID}`);
-        await fetchSavedDiets(); // Re-fetch the diets to get the updated list
-    } catch (error) {
-        console.error('Failed to delete diet:', error);
-    }
-    setIsLoading(false);
-};
-
+    // Now handleDelete can call fetchSavedDiets since it's defined in the component scope
+    const handleDelete = async (dietID) => {
+        if (!currentUser) {
+            console.error('No current user found');
+            return;
+        }
+        setIsLoading(true);
+        try {
+            await api.delete(`/delete-diet/${currentUser.email}/${dietID}`);
+            await fetchSavedDiets(); // Re-fetch the diets to get the updated list
+        } catch (error) {
+            console.error('Failed to delete diet:', error);
+        }
+        setIsLoading(false);
+    };
 
     if (isLoading) {
         return <div>Loading...</div>;

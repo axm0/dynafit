@@ -11,8 +11,8 @@ function ViewPastWorkouts() {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-     // Shared styles
-     const containerStyle = {
+    // Shared styles
+    const containerStyle = {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -46,15 +46,22 @@ function ViewPastWorkouts() {
         width: '90%',
         maxWidth: '320px',
     };
-    
+
+    const workoutContainerStyle = {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center', // Center align items vertically
+        width: '100%',
+    };
+
     const handleDeleteWorkout = async (workoutId) => {
         try {
             // Send a DELETE request to '/delete-workout' to delete a specific workout
             await api.delete(`/delete-workout/${currentUser.email}/${workoutId}`);
-            
+
             // Fetch the updated list of past workouts
             fetchWorkouts();
-            
+
             console.info('Workout deleted successfully.');
         } catch (error) {
             console.error('Failed to delete workout:', error);
@@ -90,7 +97,7 @@ function ViewPastWorkouts() {
             <h1 style={{ fontSize: '36px', fontWeight: '800', marginBottom: '20px' }}>Past Workouts</h1>
             {error && <p className="error" style={{ color: 'red' }}>{error}</p>}
             {pastWorkouts && pastWorkouts.length > 0 ? (
-                <div style={{ width: '100%' }}>
+                <div style={workoutContainerStyle}>
                     {pastWorkouts.map((workoutItem) => (
                         <div key={workoutItem.workoutId} style={workoutItemStyle}>
                             <ReactMarkdown>{workoutItem.workout}</ReactMarkdown>
