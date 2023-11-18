@@ -98,8 +98,9 @@ function ViewPastWorkouts() {
             {error && <p className="error" style={{ color: 'red' }}>{error}</p>}
             {pastWorkouts && pastWorkouts.length > 0 ? (
                 <div style={workoutContainerStyle}>
-                    {pastWorkouts.map((workoutItem) => (
+                    {pastWorkouts.map((workoutItem, index) => (
                         <div key={workoutItem.workoutId} style={workoutItemStyle}>
+                            <h2>Workout {index + 1}</h2>
                             <ReactMarkdown>{workoutItem.workout}</ReactMarkdown>
                             <button onClick={() => handleDeleteWorkout(workoutItem.workoutId)} style={buttonStyle}>Delete</button>
                         </div>

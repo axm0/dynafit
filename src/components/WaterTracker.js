@@ -15,6 +15,20 @@ function WaterTracker() {
         const response = await api.post('/generate-water', { amountOfWater, unitOfWater });
         setWater(response.data.water);
     };
+
+    const buttonStyle = {
+        width: '90%',
+        padding: '10px',
+        borderRadius: '20px',
+        background: '#0068FF',
+        color: 'white',
+        fontWeight: '800',
+        fontSize: '22px',
+        border: 'none',
+        marginBottom: '20px',
+        cursor: 'pointer',
+        maxWidth: '320px',
+    };
     
 //Here is the layout for the page. We have how much they have drunk, units of water for measurement, and a generate at the end
     return ( 
@@ -24,7 +38,7 @@ function WaterTracker() {
                 
                 <div style={{ display: 'block', margin: '10px 0' }}>
                     <label style={{ display: 'block' }}>
-                        Enter your How Much Water You Have Drunk:
+                        Enter your How Much Water You Have Drank:
                     </label>
                         <input
                             type="text"
@@ -45,7 +59,7 @@ function WaterTracker() {
                         />
                 </div>
                 <div style={{ display: 'block', margin: '10px 0' }}>
-                    <button type="submit">Generate</button>
+                    <button style={buttonStyle} type="submit">Generate</button>
                 </div>
             </form>
             {water && (

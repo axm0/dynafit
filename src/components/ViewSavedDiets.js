@@ -105,10 +105,10 @@ function ViewSavedDiets() {
             <h1 style={{ fontSize: '36px', fontWeight: '800', marginBottom: '20px' }}>Saved Diets</h1>
             {savedDiets.length > 0 ? (
                 <ul style={{ listStyle: 'none', padding: 0 }}>
-                    {savedDiets.map(diet => (
+                    {savedDiets.map((diet, index) => (
                         <li key={diet.dietID} style={listItemStyle}>
                             <div>
-                                <h2>{diet.dietID}</h2>
+                                <h2>Diet {index + 1}</h2>
                                 <ReactMarkdown>{diet.dietPlan}</ReactMarkdown>
                                 <button onClick={() => handleDelete(diet.dietID)} style={buttonStyle}>Delete</button>
                             </div>

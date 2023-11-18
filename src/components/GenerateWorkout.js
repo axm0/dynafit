@@ -64,6 +64,20 @@ function GenerateWorkout() {
         background: '#0068FF',
         color: 'white',
         fontWeight: '800',
+        fontSize: '22px',
+        border: 'none',
+        marginBottom: '20px',
+        cursor: 'pointer',
+        maxWidth: '320px',
+    };
+
+    const genButtonStyle = {
+        width: '90%',
+        padding: '10px',
+        borderRadius: '20px',
+        background: '#44546c',
+        color: 'white',
+        fontWeight: '800',
         fontSize: '24px',
         border: 'none',
         marginBottom: '20px',
@@ -219,7 +233,7 @@ function GenerateWorkout() {
                 )}
 
                 {/* Submit Button */}
-                <Button type="submit" style={buttonStyle}>
+                <Button type="submit" style={genButtonStyle}>
                     Generate
                 </Button>
             </form>

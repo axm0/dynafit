@@ -40,7 +40,7 @@ function WorkoutDashboard() {
     return (
         <div style={dashboardStyle}>
             <h2 style={headingStyle}>Workout Dashboard</h2>
-            <button onClick={() => navigate('/generate-workout')} style={buttonStyle}>Generate a Workout</button>
+            <button onClick={() => navigate('/generate-workout')} style={buttonStyle}>Generate a Workout!</button>
             <button onClick={() => navigate('/view-past-workouts')} style={buttonStyle}>View Saved Workouts</button>
         </div>
     );

@@ -99,6 +99,20 @@ function GenerateDiet() {
         background: '#0068FF',
         color: 'white',
         fontWeight: '800',
+        fontSize: '22px',
+        border: 'none',
+        marginBottom: '20px',
+        cursor: 'pointer',
+        maxWidth: '320px',
+    };
+
+    const genButtonStyle = {
+        width: '90%',
+        padding: '10px',
+        borderRadius: '20px',
+        background: '#44546c',
+        color: 'white',
+        fontWeight: '800',
         fontSize: '24px',
         border: 'none',
         marginBottom: '20px',
@@ -225,7 +239,7 @@ function GenerateDiet() {
                 {/* Loading Indicator */}
                 {loading && <CircularProgress style={{ marginBottom: 20 }} />}
 
-                <Button style={buttonStyle} type="submit">Generate</Button>
+                <Button style={genButtonStyle} type="submit">Generate</Button>
             </form>
 
             {/* Display Diet Plan and Save Button */}
@@ -241,7 +255,7 @@ function GenerateDiet() {
 
             {/* Button to navigate back to the diet dashboard */}
             <button onClick={handleReturnToDashboard} style={buttonStyle}>
-                Back to Diet Dashboard
+                Return to Diet Dashboard
             </button>
 
             {/* Save Confirmation Popup */}

@@ -45,7 +45,7 @@ function BottomNav() {
             <BottomNavigationAction label="Workout" value="workout-dashboard" icon={<FitnessCenterIcon />} style={bottomNavActionStyle} />
             <BottomNavigationAction label="Diet" value="diet-dashboard" icon={<RestaurantMenuIcon />} style={bottomNavActionStyle} />
             <BottomNavigationAction label="Profile" value="profile" icon={<PersonIcon />} style={bottomNavActionStyle} />
-            <BottomNavigationAction label="Water Goals" value="water-dashboard" icon={<OpacityIcon />} style={bottomNavActionStyle} />
+            <BottomNavigationAction label="Water" value="water-dashboard" icon={<OpacityIcon />} style={bottomNavActionStyle} />
             <BottomNavigationAction label="Logout" value="logout" icon={<LogoutIcon />} style={bottomNavActionStyle} />
         </BottomNavigation>
     );
