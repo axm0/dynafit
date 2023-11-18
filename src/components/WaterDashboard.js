@@ -4,6 +4,18 @@ import { useNavigate } from 'react-router-dom';
 function WaterDashboard() {
     const navigate = useNavigate();
 
+    const containerStyle = {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        height: 'auto',
+        paddingTop: '10vh',
+        paddingBottom: '10vh',
+        background: 'white',
+        marginBottom: '60px',
+    };
+
     const buttonStyle = {
         width: '90%',
         padding: '10px',
@@ -18,6 +30,12 @@ function WaterDashboard() {
         maxWidth: '320px',
     };
 
+    const headingStyle = {
+        fontSize: '36px',
+        fontWeight: '800',
+        color: '#0d47a1',
+        marginBottom: '20px',
+    };
 
 //This is the layout with the button
     return (
