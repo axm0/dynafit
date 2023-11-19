@@ -46,3 +46,5 @@ To start the backend server, run:
    node server.js
    ```
 After installing the required dependencies for both the frontend and backend, the application should work as intended on your local development environment.
+
+To view in mobile (the app's intendend view), right click on the page and click inspect. Then in the upper right corner, make the dimensions an iPhone SE.  
