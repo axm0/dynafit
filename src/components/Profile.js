@@ -1,6 +1,8 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'; //adam and kk wrote this page
+// kk did front end, hydration error message, sliders for weight and height, share progress
+//adam did name, dob, bmi calc, age calc, add remove goal, reset hydration, motivational quotes
 
-const motivationalQuotes = [
+const motivationalQuotes = [ //adam code
     "Don't limit your challenges, challenge your limits.",
     "It's never too late to become what you might have been.",
     "Do something today that your future self will thank you for.",
@@ -18,7 +20,7 @@ function getRandomMotivationalQuote() {
     return motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
 }
 
-class Profile extends Component {
+class Profile extends Component { //adam code
     constructor(props) {
         super(props);
         const savedState = JSON.parse(localStorage.getItem('profileState')) || {};
@@ -40,7 +42,7 @@ class Profile extends Component {
         };
     }
 
-    componentDidMount() {
+    componentDidMount() { //kk code
         window.addEventListener('beforeunload', this.saveStateToLocalStorage);
         if (this.state.dob) {
             this.calculateAge();
@@ -50,7 +52,7 @@ class Profile extends Component {
         }
     }
 
-    componentWillUnmount() {
+    componentWillUnmount() { //adam code
         window.removeEventListener('beforeunload', this.saveStateToLocalStorage);
         this.saveStateToLocalStorage();
     }
@@ -59,7 +61,7 @@ class Profile extends Component {
         localStorage.setItem('profileState', JSON.stringify(this.state));
     }
 
-    handleInputChange = (event) => {
+    handleInputChange = (event) => { //adam code
         const { name, value } = event.target;
         this.setState({ [name]: value }, () => {
             if (name === 'weight' || name === 'height') {
@@ -71,7 +73,7 @@ class Profile extends Component {
         });
     }
 
-    calculateBMI = () => {
+    calculateBMI = () => { //adam code
         const weight = parseFloat(this.state.weight);
         const height = parseFloat(this.state.height) / 100;
         if (weight && height) {
@@ -83,7 +85,7 @@ class Profile extends Component {
         }
     }
 
-    calculateAge = () => {
+    calculateAge = () => { // adam code
         const dob = new Date(this.state.dob);
         const today = new Date();
         const age = today.getFullYear() - dob.getFullYear();
@@ -95,7 +97,7 @@ class Profile extends Component {
         }
     }
 
-    getBMICategory = (bmi) => {
+    getBMICategory = (bmi) => { //adam code
         if (bmi < 18.5) return 'Underweight';
         if (bmi >= 18.5 && bmi < 24.9) return 'Normal weight';
         if (bmi >= 24.9 && bmi < 29.9) return 'Overweight';
@@ -106,7 +108,7 @@ class Profile extends Component {
         this.setState({ newGoal: event.target.value });
     }
 
-    addGoal = () => {
+    addGoal = () => { //adam code
         if (this.state.newGoal.trim()) {
             this.setState(prevState => ({
                 goals: [...prevState.goals, prevState.newGoal.trim()],
@@ -125,7 +127,7 @@ class Profile extends Component {
         this.setState({ newWorkout: event.target.value });
     }
 
-    addWorkout = () => {
+    addWorkout = () => { //adam code
         if (this.state.newWorkout.trim()) {
             this.setState(prevState => ({
                 workouts: [...prevState.workouts, prevState.newWorkout.trim()],
@@ -134,17 +136,17 @@ class Profile extends Component {
         }
     }
 
-    removeWorkout = (index) => {
+    removeWorkout = (index) => { // adam code
         this.setState(prevState => ({
             workouts: prevState.workouts.filter((_, i) => i !== index)
         }));
     }
 
-    handleWaterIntake = () => {
+    handleWaterIntake = () => { // KK code
         this.setState({ hydrationLevel: this.state.hydrationLevel + 1 });
     }
 
-    resetWater = () => {
+    resetWater = () => { // adam code
         this.setState({ hydrationLevel: 0 });
     }
 
@@ -160,7 +162,7 @@ class Profile extends Component {
         console.log('User Profile Data:', this.state);
     }
 
-    generateShareableText = () => {
+    generateShareableText = () => { // adam code
         const {
             name,
             dob,
@@ -198,7 +200,7 @@ class Profile extends Component {
         alert('Profile information copied to clipboard. Paste it into your Instagram caption.');
     };
 
-    render() {
+    render() { // kk did most front end 
         const { name, dob, age, weight, height, gender, bmi, bmiCategory, goals, newGoal, workouts, newWorkout, motivationalQuote } = this.state;
 
         const containerStyle = {
@@ -319,7 +321,7 @@ class Profile extends Component {
                         placeholder="New Goal"
                         onChange={this.handleNewGoalChange}
                         style={inputStyle}
-                    />
+                    /> 
                     <button onClick={this.addGoal} style={buttonStyle}>Add Goal</button>
                     <ul>
                         {goals.map((goal, index) => (
@@ -328,7 +330,7 @@ class Profile extends Component {
                             </li>
                         ))}
                     </ul>
-                    <div>
+                    <div> 
                         <h3>Hydration Level</h3>
                         {this.getWaterIntakeWarning()}
                         <p>Number of glasses today: {this.state.hydrationLevel}</p>
