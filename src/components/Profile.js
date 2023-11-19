@@ -1,10 +1,17 @@
-// Adam Moffatt
 import React, { Component } from 'react';
 
 const motivationalQuotes = [
     "Don't limit your challenges, challenge your limits.",
     "It's never too late to become what you might have been.",
-    "Do something today that your future self will thank you for."
+    "Do something today that your future self will thank you for.",
+    "The only way to do great work is to love what you do. If you haven't found it yet, keep looking. Don't settle.",
+    "Success is not final, failure is not fatal: It is the courage to continue that counts.",
+    "Believe you can and you're halfway there.",
+    "You are never too old to set another goal or to dream a new dream.",
+    "The harder you work for something, the greater you'll feel when you achieve it.",
+    "The future depends on what you do today.",
+    "Your time is limited, don't waste it living someone else's life.",
+    "The only person you are destined to become is the person you decide to be.",
 ];
 
 function getRandomMotivationalQuote() {
@@ -14,221 +21,327 @@ function getRandomMotivationalQuote() {
 class Profile extends Component {
     constructor(props) {
         super(props);
-        // Initialize state with default values or saved state (if it exists)
         const savedState = JSON.parse(localStorage.getItem('profileState')) || {};
         this.state = {
-            weight: '',
-            height: '',
-            gender: 'male',
-            bmi: null,
-            bmiCategory: '',
-            goals: [],
+            name: savedState.name || '',
+            dob: savedState.dob || '',
+            weight: savedState.weight || 50, // Default weight
+            height: savedState.height || 160, // Default height
+            gender: savedState.gender || 'male',
+            bmi: savedState.bmi || null,
+            bmiCategory: savedState.bmiCategory || '',
+            goals: savedState.goals || [],
             newGoal: '',
             motivationalQuote: getRandomMotivationalQuote(),
-            hydrationLevel: 0,
-            workouts: [],
+            workouts: savedState.workouts || [],
             newWorkout: '',
-            ...savedState, // Merge saved state to keep the user's information persistent across sessions
+            age: savedState.age || '',
+            hydrationLevel: savedState.hydrationLevel || 0, // Added hydration level
         };
     }
 
     componentDidMount() {
-        // Event listener to save state to localStorage when the window is about to unload
         window.addEventListener('beforeunload', this.saveStateToLocalStorage);
+        if (this.state.dob) {
+            this.calculateAge();
+        }
+        if (this.state.weight && this.state.height) {
+            this.calculateBMI();
+        }
     }
 
     componentWillUnmount() {
-        // Clean up event listener and save state when the component is unmounted
         window.removeEventListener('beforeunload', this.saveStateToLocalStorage);
         this.saveStateToLocalStorage();
     }
 
     saveStateToLocalStorage = () => {
-        // Persist state to localStorage
         localStorage.setItem('profileState', JSON.stringify(this.state));
     }
 
     handleInputChange = (event) => {
-        // Handle input changes for weight, height, and gender fields
         const { name, value } = event.target;
         this.setState({ [name]: value }, () => {
-            // Recalculate BMI after weight or height input change
-            if (this.state.weight && this.state.height) {
+            if (name === 'weight' || name === 'height') {
                 this.calculateBMI();
+            }
+            if (name === 'dob') {
+                this.calculateAge();
             }
         });
     }
 
     calculateBMI = () => {
-        // Calculate and update BMI (TC21 - Kshitij)
         const weight = parseFloat(this.state.weight);
         const height = parseFloat(this.state.height) / 100;
-        if (weight > 0 && height > 0) {
+        if (weight && height) {
             const bmi = (weight / (height * height)).toFixed(2);
-            this.setState({ bmi }, () => {
-                this.setBMICategory(bmi);
+            this.setState({
+                bmi: bmi,
+                bmiCategory: this.getBMICategory(bmi),
             });
         }
     }
 
-    setBMICategory = (bmi) => {
-        // Set BMI category based on calculated BMI (TC21 - Kshitij)
-        let bmiCategory = 'Underweight';
-        if (bmi >= 18.5 && bmi < 24.9) {
-            bmiCategory = 'Normal weight';
-        } else if (bmi >= 24.9 && bmi < 29.9) {
-            bmiCategory = 'Overweight';
-        } else if (bmi >= 29.9) {
-            bmiCategory = 'Obesity';
+    calculateAge = () => {
+        const dob = new Date(this.state.dob);
+        const today = new Date();
+        const age = today.getFullYear() - dob.getFullYear();
+        const m = today.getMonth() - dob.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+            this.setState({ age: age - 1 });
+        } else {
+            this.setState({ age: age });
         }
-        this.setState({ bmiCategory });
+    }
+
+    getBMICategory = (bmi) => {
+        if (bmi < 18.5) return 'Underweight';
+        if (bmi >= 18.5 && bmi < 24.9) return 'Normal weight';
+        if (bmi >= 24.9 && bmi < 29.9) return 'Overweight';
+        return 'Obesity';
     }
 
     handleNewGoalChange = (event) => {
-        // Handle input changes for new goal field
         this.setState({ newGoal: event.target.value });
     }
 
     addGoal = () => {
-        // Add a new goal to the list (TC25 - Adam)
-        if (this.state.newGoal) {
-            this.setState({
-                goals: [...this.state.goals, this.state.newGoal],
+        if (this.state.newGoal.trim()) {
+            this.setState(prevState => ({
+                goals: [...prevState.goals, prevState.newGoal.trim()],
                 newGoal: ''
-            });
+            }));
         }
     }
 
     removeGoal = (index) => {
-        // Remove a goal from the list (TC25 - Adam)
-        this.setState({
-            goals: this.state.goals.filter((_, i) => i !== index)
-        });
+        this.setState(prevState => ({
+            goals: prevState.goals.filter((_, i) => i !== index)
+        }));
     }
 
-    handleWaterIntake = () => {
-        // Increment hydration level (TC29 & TC30 - Adam)
-        this.setState({ hydrationLevel: this.state.hydrationLevel + 1 });
-    }
-
-    handleNewWorkoutChange = (event) => {
-        // Handle input changes for new workout field
+    handleWorkoutChange = (event) => {
         this.setState({ newWorkout: event.target.value });
     }
 
     addWorkout = () => {
-        // Add a new workout to the list (TC22 - Adam)
-        if (this.state.newWorkout) {
-            this.setState({
-                workouts: [...this.state.workouts, this.state.newWorkout],
+        if (this.state.newWorkout.trim()) {
+            this.setState(prevState => ({
+                workouts: [...prevState.workouts, prevState.newWorkout.trim()],
                 newWorkout: ''
-            });
+            }));
         }
     }
 
     removeWorkout = (index) => {
-        // Remove a workout from the list (TC22 - Adam)
-        this.setState({
-            workouts: this.state.workouts.filter((_, i) => i !== index)
-        });
+        this.setState(prevState => ({
+            workouts: prevState.workouts.filter((_, i) => i !== index)
+        }));
+    }
+
+    handleWaterIntake = () => {
+        this.setState({ hydrationLevel: this.state.hydrationLevel + 1 });
+    }
+
+    resetWater = () => {
+        this.setState({ hydrationLevel: 0 });
+    }
+
+    getWaterIntakeWarning = () => {
+        if (this.state.hydrationLevel < 7) {
+            return <p style={{ color: 'red' }}>Remember to stay hydrated! Aim for at least 7 glasses of water a day.</p>;
+        }
+        return null;
     }
 
     handleSubmit = (event) => {
-        // Handle form submission and prevent default form submission behavior
         event.preventDefault();
         console.log('User Profile Data:', this.state);
     }
 
+    generateShareableText = () => {
+        const {
+            name,
+            dob,
+            age,
+            weight,
+            height,
+            gender,
+            bmi,
+            bmiCategory,
+            goals,
+            hydrationLevel,
+            workouts,
+        } = this.state;
+
+        const shareableText = `
+            My Profile:
+            - Name: ${name}
+            - Date of Birth: ${dob}
+            - Age: ${age}
+            - Weight: ${weight} kg
+            - Height: ${height} cm
+            - Gender: ${gender}
+            - BMI: ${bmi} (${bmiCategory})
+            - Goals: ${goals.join(', ')}
+            - Hydration Level: ${hydrationLevel} glasses
+            - Workouts: ${workouts.join(', ')}
+        `;
+
+        const encodedShareableText = encodeURIComponent(shareableText);
+
+        const shareUrl = `https://instagram.com/?text=${encodedShareableText}`;
+
+        window.open(shareUrl, '_blank');
+
+        alert('Profile information copied to clipboard. Paste it into your Instagram caption.');
+    };
+
     render() {
+        const { name, dob, age, weight, height, gender, bmi, bmiCategory, goals, newGoal, workouts, newWorkout, motivationalQuote } = this.state;
+
+        const containerStyle = {
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            height: 'auto',
+            paddingTop: '10vh',
+            paddingBottom: '10vh',
+            background: 'white',
+            marginBottom: '60px',
+        };
+
+        const formStyle = {
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            width: '90%',
+            maxWidth: '320px',
+            margin: '0 auto',
+            padding: '20px',
+            boxSizing: 'border-box',
+        };
+
+        const inputStyle = {
+            width: '100%',
+            padding: '10px',
+            borderRadius: '20px',
+            border: '1px solid black',
+            marginBottom: '20px',
+        };
+
+        const buttonStyle = {
+            width: '90%',
+            padding: '10px',
+            borderRadius: '20px',
+            background: '#0068FF',
+            color: 'white',
+            fontWeight: '800',
+            fontSize: '22px',
+            border: 'none',
+            marginBottom: '20px',
+            cursor: 'pointer',
+            maxWidth: '320px',
+        };
+
         return (
-            <div>
-                <h2>Profile</h2>
-                <p>Motivational Quote: {this.state.motivationalQuote}</p>
-                <form onSubmit={this.handleSubmit}>
+            <div style={containerStyle}>
+                <h2 style={{ fontSize: '36px', fontWeight: '800', color: 'rgb(13, 71, 161)', margin: '20px 0' }}>
+                    Profile
+                </h2>
+
+                <p>Motivational Quote: {motivationalQuote}</p>
+                <form onSubmit={this.handleSubmit} style={formStyle}>
+                    <input
+                        type="text"
+                        name="name"
+                        value={name}
+                        placeholder="Name"
+                        onChange={this.handleInputChange}
+                        style={inputStyle}
+                    />
+                    <input
+                        type="date"
+                        name="dob"
+                        value={dob}
+                        onChange={this.handleInputChange}
+                        style={inputStyle}
+                    />
+                    {dob && <p>Current Age: {age}</p>}
                     <div>
                         <label>Weight (kg):</label>
                         <input
-                            type="number"
+                            type="range"
                             name="weight"
-                            value={this.state.weight}
+                            value={weight}
                             onChange={this.handleInputChange}
+                            style={inputStyle}
                             min="1"
+                            max="200"
+                            step="1"
                         />
+                        <span>{weight} kg</span>
                     </div>
                     <div>
                         <label>Height (cm):</label>
                         <input
-                            type="number"
+                            type="range"
                             name="height"
-                            value={this.state.height}
+                            value={height}
                             onChange={this.handleInputChange}
+                            style={inputStyle}
                             min="1"
+                            max="250"
+                            step="1"
                         />
+                        <span>{height} cm</span>
                     </div>
-                    <div>
-                        <label>Gender:</label>
-                        <select
-                            name="gender"
-                            value={this.state.gender}
-                            onChange={this.handleInputChange}
-                        >
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    {this.state.bmi && (
-                        <p>Your BMI is: {this.state.bmi} ({this.state.bmiCategory})</p>
+                    {bmi && (
+                        <p>Your BMI is: {bmi} ({bmiCategory})</p>
                     )}
-                    <button type="submit">Save Profile</button>
-                </form>
-
-                <div>
-                    <h3>Your Goals</h3>
+                    <label>Gender:</label>
+                    <select
+                        name="gender"
+                        value={gender}
+                        onChange={this.handleInputChange}
+                        style={inputStyle}
+                    >
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
                     <input
                         type="text"
-                        value={this.state.newGoal}
+                        name="newGoal"
+                        value={newGoal}
+                        placeholder="New Goal"
                         onChange={this.handleNewGoalChange}
-                        placeholder="Enter your new goal"
+                        style={inputStyle}
                     />
-                    <button onClick={this.addGoal}>Add Goal</button>
+                    <button onClick={this.addGoal} style={buttonStyle}>Add Goal</button>
                     <ul>
-                        {this.state.goals.map((goal, index) => (
+                        {goals.map((goal, index) => (
                             <li key={index}>
                                 {goal} <button onClick={() => this.removeGoal(index)}>Remove</button>
                             </li>
                         ))}
-
                     </ul>
-                </div>
-
-                <div>
-                    <h3>Hydration Level</h3>
-                    <p>Number of glasses today: {this.state.hydrationLevel}</p>
-                    <button onClick={this.handleWaterIntake}>Add a glass of water</button>
-                </div>
-
-                <div>
-                    <h3>Your Workouts</h3>
-                    <input
-                        type="text"
-                        value={this.state.newWorkout}
-                        onChange={this.handleNewWorkoutChange}
-                        placeholder="Enter your new workout"
-                    />
-                    <button onClick={this.addWorkout}>Add Workout</button>
-                    <ul>
-                        {this.state.workouts.map((workout, index) => (
-                            <li key={index}>
-                                {workout} <button onClick={() => this.removeWorkout(index)}>Remove</button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                    <div>
+                        <h3>Hydration Level</h3>
+                        {this.getWaterIntakeWarning()}
+                        <p>Number of glasses today: {this.state.hydrationLevel}</p>
+                        <button onClick={this.handleWaterIntake} style={buttonStyle}>Add a glass of water</button>
+                        <button onClick={this.resetWater} style={buttonStyle}>Reset Water</button>
+                    </div>
+                </form>
+                <button onClick={this.generateShareableText} style={buttonStyle}>
+                    Share Progress
+                </button>
             </div>
         );
     }
 }
-
 
 export default Profile;
