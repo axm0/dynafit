@@ -566,6 +566,10 @@ app.post('/generate-water', async (req, res) => {
     if (!amountOfWater.length || !unitOfWater.length) {
         return res.status(400).json({ error: "Amount of water and unit of water should not be empty." });
     }
+
+    const prompts = [];
+    if (amountOfWater.length) prompts.push(`amountOfWater: ${amountOfWater.join(', ')}`);
+    if (unitOfWater.length) prompts.push(`unitOfWater: ${unitOfWater.join(', ')}`);
 //This is the prompt fed to the api
     const prompt = `If I take in ${amountOfWater.join(', ')}, ${unitOfWater.join(', ')} how much more water do I need to reach my daily intake as an average human.`;
 
