@@ -41,7 +41,11 @@ function Login() {
     // Render the component's UI
     return (
         <div className="Desktop1" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', height: 'auto', paddingTop: '10vh', background: 'white' }}>
-            <h1 style={{ fontSize: 36, fontWeight: '800', marginTop: '20px', marginBottom: '20px' }}>Welcome back</h1>
+            <h1 style={{ fontSize: 36, fontWeight: '800', marginTop: '20px', marginBottom: '20px' }}>Welcome back  
+            
+            
+            
+                        </h1>
             <form onSubmit={handleSubmit} style={formStyle}>
                 <input
                     style={{ width: '100%', padding: '10px', borderRadius: '20px', border: '1px solid black', marginBottom: '20px' }}
